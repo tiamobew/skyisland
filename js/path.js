@@ -13,12 +13,12 @@ const TOTAL_TILES = ROWS * COLS; // 40 ช่อง
 // เลขช่องในโค้ดเริ่มจาก 0 (ช่องที่ผู้เล่นเห็น = index + 1)
 // ทางลัดพาขึ้นไปข้างหน้า ส่วนกับดักพาถอยกลับเหมือนบันไดงู
 const SPECIAL_TILES = Object.freeze({
-  3:  { to: 10, type: 'shortcut' }, // 4  -> 11
-  14: { to: 23, type: 'shortcut' }, // 15 -> 24
-  21: { to: 30, type: 'shortcut' }, // 22 -> 31
-  12: { to: 6,  type: 'trap' },     // 13 -> 7
-  28: { to: 17, type: 'trap' },     // 29 -> 18
-  36: { to: 25, type: 'trap' }      // 37 -> 26
+  3:  { to: 12, type: 'shortcut' }, // 4  -> 13
+  14: { to: 17, type: 'shortcut' }, // 15 -> 18
+  21: { to: 26, type: 'shortcut' }, // 22 -> 27
+  15: { to: 0,  type: 'trap' },     // 16 -> 1
+  28: { to: 19, type: 'trap' },     // 29 -> 20
+  37: { to: 26, type: 'trap' }      // 38 -> 27
 });
 
 const tilePositions = [];
@@ -74,17 +74,18 @@ function buildShortcut(startIndex, endIndex) {
   start.y = end.y = 0.72;
 
   const direction = new THREE.Vector3().subVectors(end, start).normalize();
-  const side = new THREE.Vector3(-direction.z, 0, direction.x).multiplyScalar(0.24);
-  const material = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.55 });
+  const side = new THREE.Vector3(-direction.z, 0, direction.x).multiplyScalar(0.2);
+  const material = new THREE.MeshStandardMaterial({
+    color: 0x22c55e, roughness: 0.55, transparent: true, opacity: 0.88
+  });
 
-  addCylinderBetween(start.clone().add(side), end.clone().add(side), 0.07, material);
-  addCylinderBetween(start.clone().sub(side), end.clone().sub(side), 0.07, material);
+  addCylinderBetween(start.clone().add(side), end.clone().add(side), 0.055, material);
+  addCylinderBetween(start.clone().sub(side), end.clone().sub(side), 0.055, material);
 
-  const distance = start.distanceTo(end);
-  const rungCount = Math.max(4, Math.floor(distance / 0.75));
+  const rungCount = 4;
   for (let i = 0; i <= rungCount; i++) {
     const point = start.clone().lerp(end, i / rungCount);
-    addCylinderBetween(point.clone().add(side), point.clone().sub(side), 0.045, material);
+    addCylinderBetween(point.clone().add(side), point.clone().sub(side), 0.035, material);
   }
 }
 
@@ -97,11 +98,11 @@ function buildTrap(startIndex, endIndex) {
 
   start.y = end.y = 0.76;
   middle.y = 0.95;
-  middle.add(side.multiplyScalar(1.1));
+  middle.add(side.multiplyScalar(0.5));
 
   const curve = new THREE.CatmullRomCurve3([start, middle, end]);
   const snake = new THREE.Mesh(
-    new THREE.TubeGeometry(curve, 28, 0.13, 8, false),
+    new THREE.TubeGeometry(curve, 20, 0.1, 8, false),
     new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.5 })
   );
   snake.castShadow = true;

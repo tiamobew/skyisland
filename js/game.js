@@ -11,7 +11,8 @@ const PLAYER_COLORS = ['#E4694C', '#3EC6A0', '#FFE49C', '#8B7FE8'];
 let players = [];
 let currentPlayerIndex = 0;
 let currentQuestion = null;
-let currentLevel = 'easy';
+let currentStage = 'decimal';
+let currentDifficulty = 'easy';
 let currentTimeLimit = 15;
 let hintUsedThisQuestion = false;
 
@@ -19,7 +20,7 @@ let timerInterval = null;
 let timerTimeout = null;
 let questionStartTime = null;
 
-const CHAR_SCALE = 1.6;      // ขนาดตัวละคร (ใหญ่ขึ้นจากเดิม)
+const CHAR_SCALE = 1.9;      // ขนาดตัวละครที่มองเห็นได้ชัดขึ้นบนกระดาน
 const BASE_POINTS = 50;      // คะแนนพื้นฐานเมื่อตอบถูก
 const MAX_SPEED_BONUS = 50;  // คะแนนโบนัสสูงสุดเมื่อตอบไวมาก
 const HINT_COST = 20;        // แต้มที่ใช้แลกคำใบ้ 1 ครั้ง
@@ -115,8 +116,8 @@ function updatePawnPosition(playerIndex) {
   const p = players[playerIndex];
   const basePos = tilePositions[p.position];
   const angle = (playerIndex / players.length) * Math.PI * 2;
-  const offsetX = Math.cos(angle) * 0.55;
-  const offsetZ = Math.sin(angle) * 0.55;
+  const offsetX = Math.cos(angle) * 0.68;
+  const offsetZ = Math.sin(angle) * 0.68;
   p.characterGroup.position.set(basePos.x + offsetX, basePos.y, basePos.z + offsetZ);
 }
 
@@ -133,24 +134,26 @@ function animateCharacters(t) {
     const bobOffset = Math.sin(t * 3) * 0.15;
     turnIndicatorMesh.position.set(
       activePlayer.characterGroup.position.x,
-      activePlayer.characterGroup.position.y + 2.0 + bobOffset,
+      activePlayer.characterGroup.position.y + 2.55 + bobOffset,
       activePlayer.characterGroup.position.z
     );
     turnIndicatorMesh.rotation.y += 0.05; // หมุนช้า ๆ ให้เด่น
   }
 }
 
-// ---------- เดินหมากทีละช่อง (แบบกระโดด) ----------
-function movePawnSteps(playerIndex, steps, onComplete) {
+// ---------- เดินหมากทีละช่อง (รองรับทั้งเดินหน้าและถอยหลัง) ----------
+function movePawnDelta(playerIndex, delta, onComplete) {
   const player = players[playerIndex];
-  let remaining = steps;
+  let remaining = Math.abs(delta);
+  const direction = delta >= 0 ? 1 : -1;
 
   function stepOnce() {
-    if (remaining <= 0 || player.position >= TOTAL_TILES - 1) {
+    const nextPosition = player.position + direction;
+    if (remaining <= 0 || nextPosition < 0 || nextPosition >= TOTAL_TILES) {
       onComplete && onComplete();
       return;
     }
-    player.position++;
+    player.position = nextPosition;
     updatePawnPosition(playerIndex);
     bouncePawn(player.characterGroup);
     remaining--;
@@ -160,9 +163,43 @@ function movePawnSteps(playerIndex, steps, onComplete) {
   stepOnce();
 }
 
+function movePawnSteps(playerIndex, steps, onComplete) {
+  movePawnDelta(playerIndex, steps, onComplete);
+}
+
 function bouncePawn(group) {
   group.scale.set(CHAR_SCALE, CHAR_SCALE * 1.35, CHAR_SCALE);
   setTimeout(() => group.scale.set(CHAR_SCALE, CHAR_SCALE, CHAR_SCALE), 160);
+}
+
+// ---------- กล่องลึกลับและวงล้อดวง ----------
+function resolveMysteryBox(playerIndex, onComplete) {
+  const player = players[playerIndex];
+  if (!MYSTERY_BOX_TILES.has(player.position)) {
+    onComplete && onComplete();
+    return;
+  }
+
+  const messageEl = document.getElementById('round-message');
+  const move = randomRouletteMove();
+  messageEl.textContent = `เจอกล่องลึกลับที่ช่อง ${player.position + 1}! กำลังหมุนวงล้อดวง... 🎁`;
+
+  setTimeout(() => {
+    spinRoulette(move, () => {
+      const requestedTarget = player.position + move;
+      const target = Math.max(0, Math.min(TOTAL_TILES - 1, requestedTarget));
+      const actualDelta = target - player.position;
+      const isForward = move > 0;
+
+      messageEl.textContent = isForward
+        ? `วงล้อได้ +${move}! เดินหน้า ${Math.abs(actualDelta)} ช่อง 🍀`
+        : `วงล้อได้ ${move}! ถอยหลัง ${Math.abs(actualDelta)} ช่อง 🌪️`;
+
+      movePawnDelta(playerIndex, actualDelta, () => {
+        setTimeout(() => onComplete && onComplete(), 750);
+      });
+    });
+  }, 500);
 }
 
 // ---------- เวลานับถอยหลัง ----------
@@ -237,7 +274,7 @@ function nextTurn() {
 }
 
 function askQuestion() {
-  currentQuestion = generateQuestion(currentLevel);
+  currentQuestion = generateQuestion(currentStage, currentDifficulty);
   document.getElementById('question-text').textContent = currentQuestion.text;
 
   hintUsedThisQuestion = false;
@@ -310,15 +347,17 @@ function handleAnswer(selected, btnEl) {
       : `ถูกต้อง! +${pointsEarned} คะแนน กำลังทอยลูกเต๋า...`;
     renderPlayerPanel();
 
-    const steps = Math.floor(Math.random() * 6) + 1;
+    const steps = randomDiceRoll();
     rollDice(steps, () => {
       document.getElementById('round-message').textContent = `ได้ ${steps} แต้ม! เดินหน้า ${steps} ช่อง`;
       movePawnSteps(currentPlayerIndex, steps, () => {
-        if (player.position >= TOTAL_TILES - 1) {
-          showWin(player);
-        } else {
-          setTimeout(nextTurn, 900);
-        }
+        resolveMysteryBox(currentPlayerIndex, () => {
+          if (player.position >= TOTAL_TILES - 1) {
+            showWin(player);
+          } else {
+            setTimeout(nextTurn, 900);
+          }
+        });
       });
     });
   } else {
@@ -374,7 +413,7 @@ function renderPlayerPanel() {
   });
 
   document.getElementById('turn-indicator').textContent =
-    `ด่าน${LEVEL_CONFIG[currentLevel].label} — ตาของ ${players[currentPlayerIndex].name}`;
+    `${STAGE_CONFIG[currentStage].label} · ${DIFFICULTY_CONFIG[currentDifficulty].label} — ตาของ ${players[currentPlayerIndex].name}`;
 
   applyPlayerTheme(players[currentPlayerIndex].color);
 }
@@ -405,8 +444,9 @@ function showWin(player) {
 }
 
 // ---------- เริ่มเกมใหม่ทั้งหมด ----------
-function startGame(playerCount, level, timeLimit, names) {
-  currentLevel = level;
+function startGame(playerCount, stage, difficulty, timeLimit, names) {
+  currentStage = stage;
+  currentDifficulty = difficulty;
   currentTimeLimit = timeLimit;
   createPlayers(playerCount, names);
   createPawns();

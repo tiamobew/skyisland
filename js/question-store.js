@@ -1,77 +1,24 @@
-/* คลังโจทย์ที่แก้ไขได้สำหรับ Sky Island (บันทึกใน localStorage) */
+/* คลังโจทย์ที่แก้ไขได้: 3 ด่าน × 3 ระดับ บันทึกใน localStorage โดยไม่จำกัดจำนวน */
 (function () {
   'use strict';
 
   const STORAGE_KEY = 'skyisland_question_bank_v1';
-  const LEVELS = ['easy', 'medium', 'hard'];
+  const STAGES = ['counting', 'decimal', 'percent'];
+  const DIFFICULTIES = ['easy', 'medium', 'hard'];
 
   const DEFAULT_QUESTIONS = [
-    {
-      id: 'easy-1', level: 'easy', enabled: true,
-      text: 'แม่ค้าขายส้มได้เงิน 12.5 บาท และขายมะม่วงได้เงิน 8.3 บาท รวมได้เงินทั้งหมดกี่บาท',
-      answer: 20.8, choices: [20.8, 20.2, 21.8, 4.2],
-      hint: 'นำเงินที่ขายได้ทั้งสองจำนวนมาบวกกัน'
-    },
-    {
-      id: 'easy-2', level: 'easy', enabled: true,
-      text: 'ถุงข้าวสารหนัก 9.6 กิโลกรัม แบ่งให้เพื่อนบ้าน 2.4 กิโลกรัม เหลือข้าวสารกี่กิโลกรัม',
-      answer: 7.2, choices: [7.2, 6.2, 8.2, 12],
-      hint: 'นำน้ำหนักตั้งต้นลบด้วยส่วนที่แบ่งไป'
-    },
-    {
-      id: 'easy-3', level: 'easy', enabled: true,
-      text: 'ริบบิ้นเส้นละ 2.5 เมตร จำนวน 4 เส้น ยาวรวมกันกี่เมตร',
-      answer: 10, choices: [10, 6.5, 8, 12.5],
-      hint: 'นำความยาวต่อเส้นคูณกับจำนวนเส้น'
-    },
-    {
-      id: 'easy-4', level: 'easy', enabled: true,
-      text: 'น้ำผลไม้ 8.4 ลิตร แบ่งใส่ขวดเท่า ๆ กัน 4 ขวด แต่ละขวดมีน้ำผลไม้กี่ลิตร',
-      answer: 2.1, choices: [2.1, 2.4, 3.1, 4.4],
-      hint: 'นำปริมาณทั้งหมดหารด้วยจำนวนขวด'
-    },
-    {
-      id: 'medium-1', level: 'medium', enabled: true,
-      text: 'เช้าขายของได้เงิน 25.50 บาท บ่ายขายได้อีก 18.75 บาท แล้วซื้อวัตถุดิบ 12.25 บาท เหลือเงินกี่บาท',
-      answer: 32, choices: [32, 31, 42, 56.5],
-      hint: 'บวกเงินที่ขายได้ทั้งสองช่วง แล้วลบเงินที่ซื้อวัตถุดิบ'
-    },
-    {
-      id: 'medium-2', level: 'medium', enabled: true,
-      text: 'ซื้อสมุดราคาเล่มละ 12.50 บาท จำนวน 4 เล่ม จ่ายเงิน 60 บาท ได้รับเงินทอนกี่บาท',
-      answer: 10, choices: [10, 8, 12.5, 50],
-      hint: 'คูณราคาต่อเล่มกับจำนวนเล่ม แล้วนำไปลบจากเงินที่จ่าย'
-    },
-    {
-      id: 'medium-3', level: 'medium', enabled: true,
-      text: 'วันแรกเดินทาง 7.25 กิโลเมตร วันต่อมาเดินทางวันละ 2.50 กิโลเมตร เป็นเวลา 4 วัน รวมเดินทางกี่กิโลเมตร',
-      answer: 17.25, choices: [17.25, 9.75, 10, 19.75],
-      hint: 'คูณระยะทางต่อวันกับจำนวนวัน แล้วบวกกับระยะทางวันแรก'
-    },
-    {
-      id: 'hard-1', level: 'hard', enabled: true,
-      text: 'เช้าขายของได้เงิน 85.50 บาท บ่ายขายได้ 64.25 บาท ซื้อวัตถุดิบชิ้นละ 12.50 บาท จำนวน 4 ชิ้น เหลือเงินกี่บาท',
-      answer: 99.75, choices: [99.75, 100.25, 149.75, 49.75],
-      hint: 'บวกยอดขายทั้งสองช่วง คูณราคาวัตถุดิบกับจำนวน แล้วนำผลคูณไปลบ'
-    },
-    {
-      id: 'hard-2', level: 'hard', enabled: true,
-      text: 'ซื้อดินสอด้ามละ 7.25 บาท 4 ด้าม และยางลบก้อนละ 4.50 บาท 3 ก้อน จ่าย 100 บาท ได้รับเงินทอนกี่บาท',
-      answer: 57.5, choices: [57.5, 42.5, 71, 53.5],
-      hint: 'หาราคารวมของดินสอและยางลบ แล้วลบออกจากเงินที่จ่าย'
-    },
-    {
-      id: 'hard-3', level: 'hard', enabled: true,
-      text: 'น้ำผลไม้ 18.75 ลิตร รวมกับ 13.25 ลิตร แบ่งเท่ากัน 8 ขวด แต่ละขวดใช้ไป 1.25 ลิตร เหลือขวดละกี่ลิตร',
-      answer: 2.75, choices: [2.75, 4, 3.25, 1.75],
-      hint: 'บวกปริมาณทั้งหมด หารด้วยจำนวนขวด แล้วลบปริมาณที่ใช้ไป'
-    }
+    { id:'counting-easy-1', stage:'counting', difficulty:'easy', enabled:true, text:'มีลูกโป่ง 8 ใบ ซื้อเพิ่มอีก 7 ใบ มีลูกโป่งทั้งหมดกี่ใบ', answer:15, choices:[15,14,16,17], hint:'นำจำนวนลูกโป่งทั้งสองจำนวนมาบวกกัน' },
+    { id:'counting-medium-1', stage:'counting', difficulty:'medium', enabled:true, text:'ห้องสมุดมีหนังสือ 48 เล่ม ยืมออกไป 19 เล่ม เหลือหนังสือกี่เล่ม', answer:29, choices:[29,27,31,67], hint:'นำจำนวนที่ยืมออกไปลบจากจำนวนหนังสือทั้งหมด' },
+    { id:'counting-hard-1', stage:'counting', difficulty:'hard', enabled:true, text:'มีดินสอ 12 กล่อง กล่องละ 6 แท่ง และมีดินสอแยกอีก 18 แท่ง รวมทั้งหมดกี่แท่ง', answer:90, choices:[90,72,84,108], hint:'คูณจำนวนกล่องกับจำนวนต่อกล่อง แล้วบวกดินสอที่แยกไว้' },
+    { id:'decimal-easy-1', stage:'decimal', difficulty:'easy', enabled:true, text:'แม่ค้าขายส้มได้เงิน 12.5 บาท และขายมะม่วงได้เงิน 8.3 บาท รวมได้เงินทั้งหมดกี่บาท', answer:20.8, choices:[20.8,20.2,21.8,4.2], hint:'นำเงินที่ขายได้ทั้งสองจำนวนมาบวกกัน' },
+    { id:'decimal-medium-1', stage:'decimal', difficulty:'medium', enabled:true, text:'ซื้อสมุดราคาเล่มละ 12.50 บาท จำนวน 4 เล่ม จ่ายเงิน 60 บาท ได้รับเงินทอนกี่บาท', answer:10, choices:[10,8,12.5,50], hint:'คูณราคาต่อเล่มกับจำนวนเล่ม แล้วนำไปลบจากเงินที่จ่าย' },
+    { id:'decimal-hard-1', stage:'decimal', difficulty:'hard', enabled:true, text:'เช้าขายของได้เงิน 85.50 บาท บ่ายขายได้ 64.25 บาท ซื้อวัตถุดิบชิ้นละ 12.50 บาท จำนวน 4 ชิ้น เหลือเงินกี่บาท', answer:99.75, choices:[99.75,100.25,149.75,49.75], hint:'บวกยอดขาย คำนวณค่าวัตถุดิบ แล้วนำมาลบกัน' },
+    { id:'percent-easy-1', stage:'percent', difficulty:'easy', enabled:true, text:'10% ของ 200 เท่ากับเท่าไร', answer:20, choices:[20,10,40,180], hint:'10% คือหนึ่งในสิบของจำนวนทั้งหมด' },
+    { id:'percent-medium-1', stage:'percent', difficulty:'medium', enabled:true, text:'เสื้อราคา 500 บาท ลดราคา 20% ต้องจ่ายเงินกี่บาท', answer:400, choices:[400,100,480,300], hint:'หาราคาที่ลด 20% ก่อน แล้วลบออกจากราคาเต็ม' },
+    { id:'percent-hard-1', stage:'percent', difficulty:'hard', enabled:true, text:'นักเรียน 40 คน เป็นนักเรียนชาย 35% มีนักเรียนชายกี่คน', answer:14, choices:[14,12,16,26], hint:'คูณจำนวนนักเรียนทั้งหมดด้วย 35 แล้วหารด้วย 100' }
   ];
 
-  function clone(value) {
-    return JSON.parse(JSON.stringify(value));
-  }
-
+  function clone(value) { return JSON.parse(JSON.stringify(value)); }
   function numberValue(value) {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : null;
@@ -79,14 +26,15 @@
 
   function normalizeQuestion(item, index) {
     if (!item || typeof item !== 'object') return null;
-    const level = LEVELS.includes(item.level) ? item.level : 'easy';
+    const stage = STAGES.includes(item.stage) ? item.stage : 'decimal';
+    const legacyLevel = DIFFICULTIES.includes(item.level) ? item.level : null;
+    const difficulty = DIFFICULTIES.includes(item.difficulty) ? item.difficulty : (legacyLevel || 'easy');
     const text = String(item.text || '').trim();
     const answer = numberValue(item.answer);
     const hint = String(item.hint || '').trim();
-    const rawChoices = Array.isArray(item.choices) ? item.choices : [];
     const choices = [];
 
-    rawChoices.forEach(value => {
+    (Array.isArray(item.choices) ? item.choices : []).forEach(value => {
       const number = numberValue(value);
       if (number !== null && !choices.includes(number)) choices.push(number);
     });
@@ -95,25 +43,36 @@
 
     let fallback = 1;
     while (choices.length < 4) {
-      const next = Number((answer + fallback).toFixed(level === 'easy' ? 1 : 2));
+      const next = Number((answer + fallback).toFixed(stage === 'decimal' ? 2 : 0));
       if (!choices.includes(next)) choices.push(next);
       fallback++;
     }
 
     return {
       id: String(item.id || `question-${Date.now()}-${index}`),
-      level,
+      stage,
+      difficulty,
+      level: difficulty,
+      source: item.source === 'csv' ? 'csv' : 'local',
       enabled: item.enabled !== false,
       text,
       answer,
       choices: choices.slice(0, 4),
-      hint: hint || 'ลองแยกสิ่งที่โจทย์ให้มา แล้วคำนวณทีละขั้น'
+      hint: hint || 'แยกข้อมูลที่โจทย์ให้มา แล้วคำนวณทีละขั้น'
     };
   }
 
   function normalizeBank(items) {
     if (!Array.isArray(items)) return [];
-    return items.map(normalizeQuestion).filter(Boolean);
+    const seenIds = new Set();
+    return items.map(normalizeQuestion).filter(Boolean).map((item, index) => {
+      const baseId = item.id;
+      let uniqueId = baseId;
+      let suffix = 1;
+      while (seenIds.has(uniqueId)) uniqueId = `${baseId}-${index}-${suffix++}`;
+      seenIds.add(uniqueId);
+      return { ...item, id: uniqueId };
+    });
   }
 
   function load() {
@@ -125,10 +84,20 @@
         return defaults;
       }
       const parsed = normalizeBank(JSON.parse(raw));
-      return parsed.length ? parsed : clone(DEFAULT_QUESTIONS);
-    } catch (error) {
-      return clone(DEFAULT_QUESTIONS);
-    }
+      if (parsed.length) {
+        const merged = parsed.slice();
+        DEFAULT_QUESTIONS.forEach(defaultQuestion => {
+          const hasSelection = merged.some(item =>
+            item.stage === defaultQuestion.stage && item.difficulty === defaultQuestion.difficulty
+          );
+          if (!hasSelection) merged.push(clone(defaultQuestion));
+        });
+        const normalized = normalizeBank(merged);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+        return normalized;
+      }
+    } catch (error) { /* ใช้ค่าเริ่มต้นด้านล่าง */ }
+    return reset();
   }
 
   function save(items) {
@@ -144,34 +113,103 @@
     return defaults;
   }
 
-  function enabledForLevel(level) {
-    return load().filter(item => item.level === level && item.enabled);
+  function enabledForSelection(stage, difficulty) {
+    return load().filter(item => item.stage === stage && item.difficulty === difficulty && item.enabled);
   }
 
   function importJson(text) {
     const parsed = JSON.parse(text);
-    const items = Array.isArray(parsed) ? parsed : parsed.questions;
-    return save(items);
+    return save(Array.isArray(parsed) ? parsed : parsed.questions);
   }
 
   function exportJson() {
-    return JSON.stringify({
-      app: 'Sky Island',
-      version: 1,
-      exportedAt: new Date().toISOString(),
-      questions: load()
-    }, null, 2);
+    return JSON.stringify({ app:'Sky Island', version:3, exportedAt:new Date().toISOString(), questions:load() }, null, 2);
+  }
+
+  function parseCsvRows(text) {
+    const rows = [];
+    let row = [];
+    let value = '';
+    let quoted = false;
+    const input = String(text || '').replace(/^\uFEFF/, '');
+    for (let i = 0; i < input.length; i++) {
+      const char = input[i];
+      if (quoted) {
+        if (char === '"' && input[i + 1] === '"') { value += '"'; i++; }
+        else if (char === '"') quoted = false;
+        else value += char;
+      } else if (char === '"') quoted = true;
+      else if (char === ',') { row.push(value); value = ''; }
+      else if (char === '\n') { row.push(value.replace(/\r$/, '')); rows.push(row); row = []; value = ''; }
+      else value += char;
+    }
+    if (value.length || row.length) { row.push(value.replace(/\r$/, '')); rows.push(row); }
+    return rows.filter(item => item.some(cell => String(cell).trim() !== ''));
+  }
+
+  function parseCsv(text, stageOverride) {
+    const rows = parseCsvRows(text);
+    if (rows.length < 2) return [];
+    const headers = rows[0].map(header => String(header).trim().toLowerCase());
+    return normalizeBank(rows.slice(1).map((row, index) => {
+      const item = {};
+      headers.forEach((header, column) => { item[header] = row[column] ?? ''; });
+      return {
+        id: item.id || `${stageOverride || 'question'}-csv-${index + 1}`,
+        stage: stageOverride || item.stage,
+        difficulty: String(item.difficulty || '').trim().toLowerCase(),
+        enabled: !['false', '0', 'no', 'ปิด'].includes(String(item.enabled).trim().toLowerCase()),
+        text: item.text,
+        answer: item.answer,
+        choices: [item.choice1, item.choice2, item.choice3, item.choice4],
+        hint: item.hint,
+        source: 'csv'
+      };
+    }));
+  }
+
+  function csvCell(value) {
+    const text = String(value ?? '');
+    return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  }
+
+  function exportCsv(stage, items) {
+    const headers = ['id','difficulty','enabled','text','answer','choice1','choice2','choice3','choice4','hint'];
+    const lines = (items || load()).filter(item => !stage || item.stage === stage).map(item => [
+      item.id, item.difficulty, item.enabled, item.text, item.answer,
+      ...(item.choices || []).slice(0, 4), item.hint
+    ].map(csvCell).join(','));
+    return `\uFEFF${headers.join(',')}\r\n${lines.join('\r\n')}`;
+  }
+
+  async function syncFromCsvSources() {
+    const results = await Promise.all(STAGES.map(async stage => {
+      const response = await fetch(`data/${stage}.csv?v=${Date.now()}`, { cache:'no-store' });
+      if (!response.ok) throw new Error(`โหลดคลังโจทย์ ${stage} ไม่สำเร็จ`);
+      return parseCsv(await response.text(), stage);
+    }));
+    const current = load().filter(item => item.source !== 'csv');
+    const byId = new Map(current.map(item => [item.id, item]));
+    results.flat().forEach(item => byId.set(item.id, item));
+    const synced = save([...byId.values()]);
+    return { questions:synced, imported:results.reduce((total, items) => total + items.length, 0) };
   }
 
   window.QuestionStore = {
     STORAGE_KEY,
-    LEVELS: LEVELS.slice(),
+    STAGES: STAGES.slice(),
+    DIFFICULTIES: DIFFICULTIES.slice(),
     DEFAULT_QUESTIONS: clone(DEFAULT_QUESTIONS),
+    normalizeQuestion,
+    normalizeBank,
     load,
     save,
     reset,
-    enabledForLevel,
+    enabledForSelection,
     importJson,
-    exportJson
+    exportJson,
+    parseCsv,
+    exportCsv,
+    syncFromCsvSources
   };
 })();

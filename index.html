@@ -3,16 +3,105 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="refresh" content="0; url=part2.html">
-<title>เกาะลอยฟ้า ผจญภัยทศนิยม</title>
-<script>location.replace('part2.html');</script>
+<title>เกาะลอยฟ้า ผจญภัยเลขคณิต</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
 <style>
-  body{ font-family:'Mitr',sans-serif; background:#dff1ff; color:#5b4b66;
-        display:flex; align-items:center; justify-content:center; height:100vh; margin:0; text-align:center; }
-  a{ color:#ff6b91; font-weight:bold; }
+.admin-question-link{display:inline-block;margin:0 0 16px;padding:8px 14px;border-radius:10px;background:#e9f5ff;color:#174f83;font-weight:700;text-decoration:none;border:1px solid #aad5f4}
+.admin-question-link:hover{background:#d8edff}
 </style>
 </head>
 <body>
-  <p>กำลังเข้าสู่เกม… ถ้าไม่เปลี่ยนหน้าอัตโนมัติ <a href="part2.html">คลิกที่นี่เพื่อเล่น</a></p>
+
+  <div id="game-layout">
+    <div id="panel-question">
+      <div id="player-panel"></div>
+
+      <div id="question-panel">
+        <div id="turn-indicator">เลือกด่าน, เวลา, ผู้เล่น แล้วตั้งชื่อเพื่อเริ่มเกม</div>
+
+        <div id="timer-row">
+          <span>⏱ เหลือเวลา <span id="timer-text">--</span> วินาที</span>
+          <div id="timer-bar-track"><div id="timer-bar"></div></div>
+        </div>
+
+        <div id="question-text">โจทย์จะปรากฏที่นี่</div>
+        <div id="choices"></div>
+
+        <div id="hint-row">
+          <button id="hint-btn">💡 ขอคำใบ้ (ใช้ 20 คะแนน)</button>
+          <div id="hint-text"></div>
+        </div>
+
+        <div id="round-message"></div>
+      </div>
+    </div>
+
+    <div id="panel-scene">
+      <div id="scene-container"></div>
+      <button id="mute-btn" title="ปิด/เปิดเสียงดนตรี">🔊</button>
+    </div>
+  </div>
+
+  <div id="start-screen" class="overlay">
+    <div class="panel">
+      <h1>เกาะลอยฟ้า ผจญภัยทศนิยม</h1>
+      <a class="admin-question-link" href="admin.html">⚙️ Admin จัดการโจทย์</a>
+
+      <p>ขั้นที่ 1: เลือกด่านความยาก</p>
+      <div id="level-buttons" class="button-row"></div>
+
+      <div id="time-section" class="hidden">
+        <p>ขั้นที่ 2: เลือกเวลาต่อคำถาม</p>
+        <div id="time-buttons" class="button-row"></div>
+        <div id="custom-time-row">
+          <input type="number" id="custom-time-input" min="5" max="180" placeholder="กำหนดเอง (วินาที)">
+          <button id="custom-time-btn">ใช้เวลานี้</button>
+        </div>
+      </div>
+
+      <div id="player-count-section" class="hidden">
+        <p>ขั้นที่ 3: เลือกจำนวนผู้เล่น (2-4 คน)</p>
+        <div id="player-count-buttons" class="button-row"></div>
+      </div>
+
+      <div id="name-section" class="hidden">
+        <p>ขั้นที่ 4: ตั้งชื่อผู้เล่น</p>
+        <div id="name-inputs"></div>
+        <button id="confirm-start-btn">เริ่มเกม!</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="overlay hidden">
+    <div class="panel">
+      <h1 id="win-text"></h1>
+      <div id="final-ranking"></div>
+      <button id="restart-btn">เล่นอีกครั้ง</button>
+    </div>
+  </div>
+
+  <div id="dice-overlay" class="hidden">
+    <div class="dice-scene">
+      <div class="dice-cube" id="dice-cube">
+        <div class="dice-face face-1"><span class="pip"></span></div>
+        <div class="dice-face face-2"><span class="pip"></span><span class="pip"></span></div>
+        <div class="dice-face face-3"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+        <div class="dice-face face-4"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+        <div class="dice-face face-5"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+        <div class="dice-face face-6"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="js/question-store.js"></script>
+  <script src="js/questions.js"></script>
+  <script src="js/scene.js"></script>
+  <script src="js/path.js"></script>
+  <script src="js/dice.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>

@@ -40,8 +40,7 @@
     <div id="panel-scene">
       <div id="scene-container"></div>
       <div id="board-legend">
-        <span><i class="legend-dot shortcut"></i> ทางลัด</span>
-        <span><i class="legend-dot trap"></i> กับดัก</span>
+        <span><i class="legend-box"></i> กล่องลึกลับ ±1–5</span>
         <span>🎲 ลูกเต๋า 1–3</span>
       </div>
       <button id="mute-btn" title="ปิด/เปิดเสียงดนตรี">🔊</button>
@@ -99,12 +98,30 @@
     </div>
   </div>
 
+  <div id="roulette-overlay" class="hidden">
+    <div class="roulette-panel">
+      <div class="roulette-title">🎁 กล่องลึกลับ</div>
+      <div class="roulette-wrap">
+        <div class="roulette-pointer"></div>
+        <div class="roulette-wheel" id="roulette-wheel">
+          <span style="--angle:18deg;--counter:-18deg">+1</span><span style="--angle:54deg;--counter:-54deg">−1</span>
+          <span style="--angle:90deg;--counter:-90deg">+2</span><span style="--angle:126deg;--counter:-126deg">−2</span>
+          <span style="--angle:162deg;--counter:-162deg">+3</span><span style="--angle:198deg;--counter:-198deg">−3</span>
+          <span style="--angle:234deg;--counter:-234deg">+4</span><span style="--angle:270deg;--counter:-270deg">−4</span>
+          <span style="--angle:306deg;--counter:-306deg">+5</span><span style="--angle:342deg;--counter:-342deg">−5</span>
+        </div>
+      </div>
+      <div id="roulette-result">กำลังหมุน...</div>
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="js/question-store.js"></script>
   <script src="js/questions.js"></script>
   <script src="js/scene.js"></script>
   <script src="js/path.js"></script>
   <script src="js/dice.js"></script>
+  <script src="js/roulette.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/game.js"></script>
   <script src="js/main.js"></script>

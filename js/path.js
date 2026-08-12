@@ -1,6 +1,6 @@
 /* =========================================================
    path.js
-   สร้างเส้นทางเดินแบบ "บันไดงู" (ซิกแซกไปเรื่อย ๆ) บนเกาะ
+   สร้างเส้นทางเดินซิกแซก พร้อมกล่องลึกลับแบบสุ่มบนเกาะ
    พร้อมป้ายเลขช่องสีสันสดใสลอยอยู่เหนือแต่ละช่อง
    tilePositions[i] = ตำแหน่ง 3D ของช่องที่ i (เริ่มนับจาก 0)
    ========================================================= */
@@ -10,16 +10,9 @@ const COLS = 8;
 const TILE_SPACING = 2.75;
 const TOTAL_TILES = ROWS * COLS; // 40 ช่อง
 
-// เลขช่องในโค้ดเริ่มจาก 0 (ช่องที่ผู้เล่นเห็น = index + 1)
-// ทางลัดพาขึ้นไปข้างหน้า ส่วนกับดักพาถอยกลับเหมือนบันไดงู
-const SPECIAL_TILES = Object.freeze({
-  3:  { to: 12, type: 'shortcut' }, // 4  -> 13
-  14: { to: 17, type: 'shortcut' }, // 15 -> 18
-  21: { to: 26, type: 'shortcut' }, // 22 -> 27
-  15: { to: 0,  type: 'trap' },     // 16 -> 1
-  28: { to: 19, type: 'trap' },     // 29 -> 20
-  37: { to: 26, type: 'trap' }      // 38 -> 27
-});
+const MYSTERY_BOX_COUNT = 6;
+const MYSTERY_BOX_TILES = new Set();
+const mysteryBoxes = [];
 
 const tilePositions = [];
 const tileMeshes = [];
@@ -53,76 +46,65 @@ function makeTileNumberTexture(number, bgColor) {
   return tex;
 }
 
-function addCylinderBetween(start, end, radius, material) {
-  const direction = new THREE.Vector3().subVectors(end, start);
-  const cylinder = new THREE.Mesh(
-    new THREE.CylinderGeometry(radius, radius, direction.length(), 8),
-    material
-  );
-  cylinder.position.copy(start).add(end).multiplyScalar(0.5);
-  cylinder.quaternion.setFromUnitVectors(
-    new THREE.Vector3(0, 1, 0),
-    direction.clone().normalize()
-  );
-  cylinder.castShadow = true;
-  islandGroup.add(cylinder);
-}
-
-function buildShortcut(startIndex, endIndex) {
-  const start = tilePositions[startIndex].clone();
-  const end = tilePositions[endIndex].clone();
-  start.y = end.y = 0.72;
-
-  const direction = new THREE.Vector3().subVectors(end, start).normalize();
-  const side = new THREE.Vector3(-direction.z, 0, direction.x).multiplyScalar(0.2);
-  const material = new THREE.MeshStandardMaterial({
-    color: 0x22c55e, roughness: 0.55, transparent: true, opacity: 0.88
-  });
-
-  addCylinderBetween(start.clone().add(side), end.clone().add(side), 0.055, material);
-  addCylinderBetween(start.clone().sub(side), end.clone().sub(side), 0.055, material);
-
-  const rungCount = 4;
-  for (let i = 0; i <= rungCount; i++) {
-    const point = start.clone().lerp(end, i / rungCount);
-    addCylinderBetween(point.clone().add(side), point.clone().sub(side), 0.035, material);
+function chooseMysteryBoxTiles() {
+  const candidates = Array.from({ length: TOTAL_TILES - 4 }, (_, i) => i + 2);
+  for (let i = candidates.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
   }
+  candidates.slice(0, MYSTERY_BOX_COUNT).forEach(index => MYSTERY_BOX_TILES.add(index));
 }
 
-function buildTrap(startIndex, endIndex) {
-  const start = tilePositions[startIndex].clone();
-  const end = tilePositions[endIndex].clone();
-  const middle = start.clone().lerp(end, 0.5);
-  const direction = new THREE.Vector3().subVectors(end, start).normalize();
-  const side = new THREE.Vector3(-direction.z, 0, direction.x);
-
-  start.y = end.y = 0.76;
-  middle.y = 0.95;
-  middle.add(side.multiplyScalar(0.5));
-
-  const curve = new THREE.CatmullRomCurve3([start, middle, end]);
-  const snake = new THREE.Mesh(
-    new THREE.TubeGeometry(curve, 20, 0.1, 8, false),
-    new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.5 })
-  );
-  snake.castShadow = true;
-  islandGroup.add(snake);
-
-  const head = new THREE.Mesh(
-    new THREE.SphereGeometry(0.27, 12, 10),
-    new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.45 })
-  );
-  head.position.copy(start).setY(0.8);
-  head.scale.set(1.25, 0.75, 1);
-  head.castShadow = true;
-  islandGroup.add(head);
+function makeQuestionMarkTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 96px Sarabun, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('?', 64, 68);
+  return new THREE.CanvasTexture(canvas);
 }
 
-function buildSpecialTileLinks() {
-  Object.entries(SPECIAL_TILES).forEach(([from, special]) => {
-    const startIndex = Number(from);
-    if (special.type === 'shortcut') buildShortcut(startIndex, special.to);
-    else buildTrap(startIndex, special.to);
+function buildMysteryBox(tileIndex) {
+  const pos = tilePositions[tileIndex];
+  const group = new THREE.Group();
+  const boxMat = new THREE.MeshStandardMaterial({ color: 0x8b5cf6, roughness: 0.42 });
+  const goldMat = new THREE.MeshStandardMaterial({ color: 0xffc94c, roughness: 0.35 });
+
+  const box = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.58, 0.72), boxMat);
+  box.castShadow = true;
+  group.add(box);
+
+  const lid = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.14, 0.82), goldMat);
+  lid.position.y = 0.36;
+  lid.castShadow = true;
+  group.add(lid);
+
+  const ribbonX = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.62, 0.76), goldMat);
+  const ribbonZ = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.62, 0.14), goldMat);
+  ribbonX.castShadow = ribbonZ.castShadow = true;
+  group.add(ribbonX, ribbonZ);
+
+  const mark = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: makeQuestionMarkTexture(), transparent: true, depthTest: false
+  }));
+  mark.position.set(0, 0.02, 0.39);
+  mark.scale.set(0.42, 0.42, 0.42);
+  group.add(mark);
+
+  group.position.set(pos.x, pos.y + 1.25, pos.z);
+  group.userData.baseY = group.position.y;
+  group.userData.phase = Math.random() * Math.PI * 2;
+  islandGroup.add(group);
+  mysteryBoxes.push(group);
+}
+
+function animateMysteryBoxes(t) {
+  mysteryBoxes.forEach(box => {
+    box.position.y = box.userData.baseY + Math.sin(t * 2 + box.userData.phase) * 0.16;
+    box.rotation.y = Math.sin(t * 0.9 + box.userData.phase) * 0.24;
   });
 }
 
@@ -140,15 +122,17 @@ function buildPath() {
     }
   }
 
+  chooseMysteryBoxTiles();
+
   tilePositions.forEach((pos, i) => {
     const tileGeo = new THREE.BoxGeometry(2.05, 0.15, 2.05);
     const isLast = i === TOTAL_TILES - 1;
-    const special = SPECIAL_TILES[i];
+    const hasMysteryBox = MYSTERY_BOX_TILES.has(i);
     const tileMat = new THREE.MeshStandardMaterial({
       color: isLast
         ? 0xFFE49C
-        : special
-          ? (special.type === 'shortcut' ? 0x86efac : 0xfca5a5)
+        : hasMysteryBox
+          ? 0xd8b4fe
           : (i % 2 === 0 ? 0xE9D8A6 : 0xDCC488)
     });
     const tile = new THREE.Mesh(tileGeo, tileMat);
@@ -165,6 +149,8 @@ function buildPath() {
     label.rotation.x = -Math.PI / 2;
     label.position.set(pos.x, pos.y + 0.09, pos.z);
     islandGroup.add(label);
+
+    if (hasMysteryBox) buildMysteryBox(i);
   });
 
   const lineGeo = new THREE.BufferGeometry().setFromPoints(
@@ -173,6 +159,5 @@ function buildPath() {
   const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff, opacity: 0.5, transparent: true });
   islandGroup.add(new THREE.Line(lineGeo, lineMat));
 
-  buildSpecialTileLinks();
 }
 buildPath();

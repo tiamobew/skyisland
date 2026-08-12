@@ -127,6 +127,7 @@ function animate() {
   animateTrees(t);
   animateClouds(t);
   animateFish(t);
+  animateMysteryBoxes(t);
   if (players.length) animateCharacters(t);
 
   renderer.render(scene, camera);

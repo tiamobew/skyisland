@@ -49,9 +49,12 @@ body {
   backdrop-filter:blur(6px);
 }
 #board-legend span { display:flex; align-items:center; gap:5px; }
-.legend-dot { width:11px; height:11px; border-radius:50%; display:inline-block; }
-.legend-dot.shortcut { background:#22c55e; }
-.legend-dot.trap { background:#ef4444; }
+.legend-box {
+  width:13px; height:13px; display:inline-block;
+  border:3px solid #FFC94C;
+  border-radius:3px;
+  background:#8B5CF6;
+}
 
 #mute-btn {
   position:absolute; top:14px; right:14px;
@@ -429,3 +432,83 @@ body {
 .dice-value-3 .pip:nth-child(1) { grid-column:1; grid-row:1; }
 .dice-value-3 .pip:nth-child(2) { grid-column:2; grid-row:2; }
 .dice-value-3 .pip:nth-child(3) { grid-column:3; grid-row:3; }
+
+/* ---------- วงล้อกล่องลึกลับ ---------- */
+#roulette-overlay {
+  position:fixed; inset:0;
+  z-index:45;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(6,20,40,0.72);
+  pointer-events:none;
+}
+.roulette-panel {
+  min-width:310px;
+  padding:22px 24px 20px;
+  border:3px solid #FFE49C;
+  border-radius:22px;
+  background:#0f2846;
+  text-align:center;
+  box-shadow:0 0 45px rgba(255,201,76,0.34);
+}
+.roulette-title {
+  margin-bottom:14px;
+  color:#FFE49C;
+  font-size:22px;
+  font-weight:800;
+}
+.roulette-wrap {
+  position:relative;
+  width:230px; height:230px;
+  margin:0 auto;
+}
+.roulette-pointer {
+  position:absolute; left:50%; top:-9px;
+  z-index:2;
+  width:0; height:0;
+  border-left:14px solid transparent;
+  border-right:14px solid transparent;
+  border-top:27px solid #FFE49C;
+  transform:translateX(-50%);
+  filter:drop-shadow(0 3px 2px rgba(0,0,0,0.35));
+}
+.roulette-wheel {
+  position:relative;
+  width:230px; height:230px;
+  overflow:hidden;
+  border:7px solid #ffffff;
+  border-radius:50%;
+  background:repeating-conic-gradient(#3EC6A0 0deg 36deg, #E4694C 36deg 72deg);
+  box-shadow:0 8px 24px rgba(0,0,0,0.38), inset 0 0 0 3px rgba(6,40,61,0.5);
+  transition:transform 2.2s cubic-bezier(.12,.72,.18,1);
+}
+.roulette-wheel::after {
+  content:'?';
+  position:absolute; left:50%; top:50%;
+  display:flex; align-items:center; justify-content:center;
+  width:52px; height:52px;
+  border:5px solid #ffffff;
+  border-radius:50%;
+  background:#8B5CF6;
+  color:#ffffff;
+  font-size:30px;
+  font-weight:800;
+  transform:translate(-50%,-50%);
+}
+.roulette-wheel span {
+  position:absolute; left:50%; top:50%;
+  z-index:1;
+  color:#ffffff;
+  font-size:17px;
+  font-weight:800;
+  text-shadow:0 1px 3px rgba(0,0,0,0.55);
+  transform:translate(-50%,-50%) rotate(var(--angle)) translateY(-84px) rotate(var(--counter));
+}
+#roulette-result {
+  min-height:34px;
+  margin-top:14px;
+  font-size:21px;
+  font-weight:800;
+  color:#ffffff;
+}
+#roulette-result.forward { color:#7DE3C8; }
+#roulette-result.backward { color:#FF9B86; }

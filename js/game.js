@@ -140,17 +140,19 @@ function animateCharacters(t) {
   }
 }
 
-// ---------- เดินหมากทีละช่อง (แบบกระโดด) ----------
-function movePawnSteps(playerIndex, steps, onComplete) {
+// ---------- เดินหมากทีละช่อง (รองรับทั้งเดินหน้าและถอยหลัง) ----------
+function movePawnDelta(playerIndex, delta, onComplete) {
   const player = players[playerIndex];
-  let remaining = steps;
+  let remaining = Math.abs(delta);
+  const direction = delta >= 0 ? 1 : -1;
 
   function stepOnce() {
-    if (remaining <= 0 || player.position >= TOTAL_TILES - 1) {
+    const nextPosition = player.position + direction;
+    if (remaining <= 0 || nextPosition < 0 || nextPosition >= TOTAL_TILES) {
       onComplete && onComplete();
       return;
     }
-    player.position++;
+    player.position = nextPosition;
     updatePawnPosition(playerIndex);
     bouncePawn(player.characterGroup);
     remaining--;
@@ -160,36 +162,43 @@ function movePawnSteps(playerIndex, steps, onComplete) {
   stepOnce();
 }
 
+function movePawnSteps(playerIndex, steps, onComplete) {
+  movePawnDelta(playerIndex, steps, onComplete);
+}
+
 function bouncePawn(group) {
   group.scale.set(CHAR_SCALE, CHAR_SCALE * 1.35, CHAR_SCALE);
   setTimeout(() => group.scale.set(CHAR_SCALE, CHAR_SCALE, CHAR_SCALE), 160);
 }
 
-// ---------- ทางลัดและกับดักแบบบันไดงู ----------
-function resolveSpecialTile(playerIndex, onComplete) {
+// ---------- กล่องลึกลับและวงล้อดวง ----------
+function resolveMysteryBox(playerIndex, onComplete) {
   const player = players[playerIndex];
-  const special = SPECIAL_TILES[player.position];
-  if (!special) {
+  if (!MYSTERY_BOX_TILES.has(player.position)) {
     onComplete && onComplete();
     return;
   }
 
-  const fromTile = player.position + 1;
-  const toTile = special.to + 1;
   const messageEl = document.getElementById('round-message');
-  const isShortcut = special.type === 'shortcut';
-
-  messageEl.textContent = isShortcut
-    ? `เจอทางลัดที่ช่อง ${fromTile}! ขึ้นไปช่อง ${toTile} 🚀`
-    : `เจอกับดักที่ช่อง ${fromTile}! ถอยกลับไปช่อง ${toTile} 🐍`;
+  const move = randomRouletteMove();
+  messageEl.textContent = `เจอกล่องลึกลับที่ช่อง ${player.position + 1}! กำลังหมุนวงล้อดวง... 🎁`;
 
   setTimeout(() => {
-    player.position = special.to;
-    updatePawnPosition(playerIndex);
-    bouncePawn(player.characterGroup);
-    renderPlayerPanel();
-    setTimeout(() => onComplete && onComplete(), 850);
-  }, 650);
+    spinRoulette(move, () => {
+      const requestedTarget = player.position + move;
+      const target = Math.max(0, Math.min(TOTAL_TILES - 1, requestedTarget));
+      const actualDelta = target - player.position;
+      const isForward = move > 0;
+
+      messageEl.textContent = isForward
+        ? `วงล้อได้ +${move}! เดินหน้า ${Math.abs(actualDelta)} ช่อง 🍀`
+        : `วงล้อได้ ${move}! ถอยหลัง ${Math.abs(actualDelta)} ช่อง 🌪️`;
+
+      movePawnDelta(playerIndex, actualDelta, () => {
+        setTimeout(() => onComplete && onComplete(), 750);
+      });
+    });
+  }, 500);
 }
 
 // ---------- เวลานับถอยหลัง ----------
@@ -341,7 +350,7 @@ function handleAnswer(selected, btnEl) {
     rollDice(steps, () => {
       document.getElementById('round-message').textContent = `ได้ ${steps} แต้ม! เดินหน้า ${steps} ช่อง`;
       movePawnSteps(currentPlayerIndex, steps, () => {
-        resolveSpecialTile(currentPlayerIndex, () => {
+        resolveMysteryBox(currentPlayerIndex, () => {
           if (player.position >= TOTAL_TILES - 1) {
             showWin(player);
           } else {

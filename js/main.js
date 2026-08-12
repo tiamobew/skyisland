@@ -125,6 +125,7 @@ document.getElementById('mute-btn').addEventListener('click', (e) => {
 
 // ---------- ปุ่มเล่นอีกครั้ง ----------
 document.getElementById('restart-btn').addEventListener('click', () => {
+  clearPlayerPawns();
   document.getElementById('win-screen').classList.add('hidden');
   document.getElementById('difficulty-section').classList.add('hidden');
   document.getElementById('time-section').classList.add('hidden');

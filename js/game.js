@@ -25,9 +25,24 @@ const BASE_POINTS = 50;      // คะแนนพื้นฐานเมื่
 const MAX_SPEED_BONUS = 50;  // คะแนนโบนัสสูงสุดเมื่อตอบไวมาก
 const HINT_COST = 20;        // แต้มที่ใช้แลกคำใบ้ 1 ครั้ง
 
+function clearPlayerPawns() {
+  players.forEach(player => {
+    const group = player.characterGroup;
+    if (!group) return;
+    islandGroup.remove(group);
+    group.traverse(child => {
+      if (child.geometry) child.geometry.dispose();
+      const materials = Array.isArray(child.material) ? child.material : [child.material];
+      materials.filter(Boolean).forEach(material => material.dispose());
+    });
+  });
+  players = [];
+  if (turnIndicatorMesh) turnIndicatorMesh.visible = false;
+}
+
 // ---------- ตั้งค่าผู้เล่น (รับชื่อที่ผู้เล่นตั้งเองได้) ----------
 function createPlayers(count, names) {
-  players = [];
+  clearPlayerPawns();
   for (let i = 0; i < count; i++) {
     const customName = (names && names[i] && names[i].trim()) ? names[i].trim() : `ผู้เล่น ${i + 1}`;
     players.push({
@@ -181,10 +196,11 @@ function resolveMysteryBox(playerIndex, onComplete) {
   }
 
   const messageEl = document.getElementById('round-message');
-  const move = randomRouletteMove();
-  messageEl.textContent = `เจอกล่องลึกลับที่ช่อง ${player.position + 1}! กำลังหมุนวงล้อดวง... 🎁`;
+  messageEl.textContent = `เจอกล่องลึกลับที่ช่อง ${player.position + 1}! กดสุ่มดวงได้เลย 🌈🎁`;
 
-  setTimeout(() => {
+  showMysteryCelebration(player.position + 1, () => {
+    const move = randomRouletteMove();
+    messageEl.textContent = 'กำลังหมุนวงล้อดวง... 🎡';
     spinRoulette(move, () => {
       const requestedTarget = player.position + move;
       const target = Math.max(0, Math.min(TOTAL_TILES - 1, requestedTarget));
@@ -199,7 +215,7 @@ function resolveMysteryBox(playerIndex, onComplete) {
         setTimeout(() => onComplete && onComplete(), 750);
       });
     });
-  }, 500);
+  });
 }
 
 // ---------- เวลานับถอยหลัง ----------

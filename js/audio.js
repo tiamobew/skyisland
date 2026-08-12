@@ -87,3 +87,14 @@ function playWrongSound() {
   osc.start(now);
   osc.stop(now + 0.35);
 }
+
+// ---------- เสียงเอฟเฟกต์พบกล่องลึกลับ / สายรุ้ง ----------
+function playMysteryRainbowSound() {
+  initAudio();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (musicMuted) return;
+  const now = audioCtx.currentTime;
+  [523.25, 659.25, 783.99, 1046.5].forEach((frequency, index) => {
+    playNote(frequency, now + index * 0.1, 0.28);
+  });
+}

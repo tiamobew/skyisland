@@ -441,6 +441,45 @@ body {
 .dice-value-3 .pip:nth-child(2) { grid-column:2; grid-row:2; }
 .dice-value-3 .pip:nth-child(3) { grid-column:3; grid-row:3; }
 
+/* ---------- ฉากสายรุ้งเมื่อพบกล่องลึกลับ ---------- */
+#mystery-celebration {
+  position:fixed; inset:0;
+  z-index:46;
+  display:flex; align-items:center; justify-content:center;
+  padding:20px;
+  background:rgba(6,20,40,0.76);
+}
+.mystery-celebration-card {
+  width:min(390px, 92vw);
+  padding:24px 22px 26px;
+  border:4px solid #ffffff;
+  border-radius:26px;
+  background:linear-gradient(135deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff,#9b5de5);
+  color:#10213f;
+  text-align:center;
+  box-shadow:0 0 55px rgba(255,255,255,0.55);
+  animation:rainbow-pop .45s ease-out;
+}
+.rainbow-icon { font-size:92px; line-height:1; animation:rainbow-float 1s ease-in-out infinite alternate; }
+.mystery-gift { margin:2px 0 5px; font-size:56px; }
+.mystery-celebration-card h2 { margin:8px 0; color:#ffffff; font-size:26px; text-shadow:0 2px 5px rgba(0,0,0,0.35); }
+.mystery-celebration-card p { margin:8px 0 18px; padding:7px 10px; border-radius:999px; background:rgba(255,255,255,0.82); font-weight:800; }
+#luck-spin-btn {
+  border:3px solid #ffffff;
+  border-radius:15px;
+  padding:14px 25px;
+  background:#10213f;
+  color:#ffffff;
+  font-size:22px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(16,33,63,0.3);
+}
+#luck-spin-btn:hover { transform:translateY(-2px); background:#173d70; }
+#luck-spin-btn:focus-visible { outline:4px solid #ffffff; outline-offset:4px; }
+@keyframes rainbow-pop { from { opacity:0; transform:scale(.68) rotate(-3deg); } to { opacity:1; transform:scale(1) rotate(0); } }
+@keyframes rainbow-float { from { transform:translateY(0) scale(1); } to { transform:translateY(-8px) scale(1.06); } }
+
 /* ---------- วงล้อกล่องลึกลับ ---------- */
 #roulette-overlay {
   position:fixed; inset:0;

@@ -98,3 +98,16 @@ function playMysteryRainbowSound() {
     playNote(frequency, now + index * 0.1, 0.28);
   });
 }
+
+// ---------- เสียงแฟนแฟร์ฉลองผู้ชนะ ----------
+function playVictoryFanfare() {
+  initAudio();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (musicMuted) return;
+  const now = audioCtx.currentTime;
+  const victoryNotes = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5, 1318.51];
+  const starts = [0, 0.13, 0.26, 0.43, 0.72, 0.86, 1.04];
+  victoryNotes.forEach((frequency, index) => {
+    playNote(frequency, now + starts[index], index === victoryNotes.length - 1 ? 0.85 : 0.3);
+  });
+}

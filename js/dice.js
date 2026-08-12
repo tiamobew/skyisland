@@ -15,6 +15,13 @@ const DICE_TARGET_ROTATION = {
   6: { x: 0, y: 180 }
 };
 
+const DICE_MIN = 1;
+const DICE_MAX = 3;
+
+function randomDiceRoll() {
+  return Math.floor(Math.random() * (DICE_MAX - DICE_MIN + 1)) + DICE_MIN;
+}
+
 function rollDice(number, onComplete) {
   const overlay = document.getElementById('dice-overlay');
   const cube = document.getElementById('dice-cube');

@@ -165,6 +165,33 @@ function bouncePawn(group) {
   setTimeout(() => group.scale.set(CHAR_SCALE, CHAR_SCALE, CHAR_SCALE), 160);
 }
 
+// ---------- ทางลัดและกับดักแบบบันไดงู ----------
+function resolveSpecialTile(playerIndex, onComplete) {
+  const player = players[playerIndex];
+  const special = SPECIAL_TILES[player.position];
+  if (!special) {
+    onComplete && onComplete();
+    return;
+  }
+
+  const fromTile = player.position + 1;
+  const toTile = special.to + 1;
+  const messageEl = document.getElementById('round-message');
+  const isShortcut = special.type === 'shortcut';
+
+  messageEl.textContent = isShortcut
+    ? `เจอทางลัดที่ช่อง ${fromTile}! ขึ้นไปช่อง ${toTile} 🚀`
+    : `เจอกับดักที่ช่อง ${fromTile}! ถอยกลับไปช่อง ${toTile} 🐍`;
+
+  setTimeout(() => {
+    player.position = special.to;
+    updatePawnPosition(playerIndex);
+    bouncePawn(player.characterGroup);
+    renderPlayerPanel();
+    setTimeout(() => onComplete && onComplete(), 850);
+  }, 650);
+}
+
 // ---------- เวลานับถอยหลัง ----------
 function clearQuestionTimer() {
   clearInterval(timerInterval);
@@ -310,15 +337,17 @@ function handleAnswer(selected, btnEl) {
       : `ถูกต้อง! +${pointsEarned} คะแนน กำลังทอยลูกเต๋า...`;
     renderPlayerPanel();
 
-    const steps = Math.floor(Math.random() * 6) + 1;
+    const steps = randomDiceRoll();
     rollDice(steps, () => {
       document.getElementById('round-message').textContent = `ได้ ${steps} แต้ม! เดินหน้า ${steps} ช่อง`;
       movePawnSteps(currentPlayerIndex, steps, () => {
-        if (player.position >= TOTAL_TILES - 1) {
-          showWin(player);
-        } else {
-          setTimeout(nextTurn, 900);
-        }
+        resolveSpecialTile(currentPlayerIndex, () => {
+          if (player.position >= TOTAL_TILES - 1) {
+            showWin(player);
+          } else {
+            setTimeout(nextTurn, 900);
+          }
+        });
       });
     });
   } else {

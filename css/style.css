@@ -353,6 +353,9 @@ body {
 }
 #confirm-start-btn:hover { transform:translateY(-2px); box-shadow:0 11px 26px rgba(255,201,76,0.38); }
 #confirm-start-btn:active { transform:scale(0.97); }
+.question-sync-status { margin:10px auto 16px; padding:8px 12px; border-radius:10px; background:#eef7ff; color:#24527a; font-size:14px; font-weight:700; }
+.question-sync-status.ready { background:#e4f8ed; color:#15724a; }
+.question-sync-status.offline { background:#fff3d9; color:#895d00; }
 
 /* ---------- ลูกเต๋า 3D (CSS) ---------- */
 #dice-overlay {

@@ -10,6 +10,16 @@ let selectedTime = null;
 let timeStepDone = false;
 let selectedPlayerCount = null;
 
+// โหลดไฟล์ CSV กลางใหม่ทุกครั้งที่เปิดเกม เพื่อให้ทุกอุปกรณ์ใช้ข้อมูลที่เผยแพร่ล่าสุด
+const questionSyncStatus = document.getElementById('question-sync-status');
+QuestionStore.syncFromCsvSources().then(result => {
+  questionSyncStatus.textContent = `✅ อัปเดตโจทย์ออนไลน์แล้ว ${result.imported} ข้อ`;
+  questionSyncStatus.classList.add('ready');
+}).catch(() => {
+  questionSyncStatus.textContent = '📦 ใช้คลังโจทย์ที่บันทึกไว้ในอุปกรณ์ (ออฟไลน์)';
+  questionSyncStatus.classList.add('offline');
+});
+
 // ---------- ขั้นที่ 1: ปุ่มเลือกด่านเนื้อหา ----------
 const stageContainer = document.getElementById('stage-buttons');
 Object.keys(STAGE_CONFIG).forEach(stageKey => {

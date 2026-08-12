@@ -73,13 +73,19 @@ button,input,select,textarea{font:inherit}.hidden{display:none!important}
         <button class="btn danger" id="reset-btn">↺ คืนค่าโจทย์เริ่มต้น</button>
       </div>
       <div class="import-zone">
-        <strong>⬆ นำเข้า JSON แยกตามด่าน (เพิ่มต่อจากโจทย์เดิม):</strong>
+        <strong>⬆ นำเข้า CSV หรือ JSON แยกตามด่าน (เพิ่มต่อจากโจทย์เดิม):</strong>
         <label class="btn" for="import-counting">ด่าน 1 จำนวนนับ</label>
-        <input class="hidden stage-import" id="import-counting" data-stage="counting" type="file" accept=".json,application/json">
+        <input class="hidden stage-import" id="import-counting" data-stage="counting" type="file" accept=".csv,.json,text/csv,application/json">
         <label class="btn" for="import-decimal">ด่าน 2 ทศนิยม</label>
-        <input class="hidden stage-import" id="import-decimal" data-stage="decimal" type="file" accept=".json,application/json">
+        <input class="hidden stage-import" id="import-decimal" data-stage="decimal" type="file" accept=".csv,.json,text/csv,application/json">
         <label class="btn" for="import-percent">ด่าน 3 ร้อยละ</label>
-        <input class="hidden stage-import" id="import-percent" data-stage="percent" type="file" accept=".json,application/json">
+        <input class="hidden stage-import" id="import-percent" data-stage="percent" type="file" accept=".csv,.json,text/csv,application/json">
+      </div>
+      <div class="import-zone">
+        <strong>⬇ ดาวน์โหลด CSV แยกด่าน:</strong>
+        <button class="btn export-stage" data-stage="counting">ด่าน 1 จำนวนนับ</button>
+        <button class="btn export-stage" data-stage="decimal">ด่าน 2 ทศนิยม</button>
+        <button class="btn export-stage" data-stage="percent">ด่าน 3 ร้อยละ</button>
       </div>
       <div id="status-message" class="notice hidden"></div>
       <div class="table-wrap">
@@ -163,7 +169,7 @@ button,input,select,textarea{font:inherit}.hidden{display:none!important}
     el('game-link').href = '?page=game';
     el('storage-note').textContent = 'โหมดออนไลน์: เมื่อบันทึกแล้ว ทุกอุปกรณ์จะใช้คลังโจทย์กลางชุดนี้หลังเปิดหรือรีเฟรชหน้าเกม';
   } else {
-    el('storage-note').textContent = 'โหมดออฟไลน์: การแก้ไขมีผลเฉพาะเบราว์เซอร์นี้ หากต้องการซิงก์ทุกอุปกรณ์ให้เปิดหน้า Admin ผ่านลิงก์ Google Apps Script';
+    el('storage-note').textContent = 'เกมออนไลน์จะโหลดไฟล์ data/counting.csv, decimal.csv และ percent.csv ล่าสุดทุกครั้ง การแก้ไขในหน้านี้เก็บเฉพาะอุปกรณ์นี้ ให้ส่งออก CSV แล้วแทนไฟล์ในเว็บไซต์เพื่ออัปเดตทุกอุปกรณ์';
   }
 
   function callGas(method, ...args){
@@ -360,20 +366,36 @@ button,input,select,textarea{font:inherit}.hidden{display:none!important}
     showStatus('ส่งออกคลังโจทย์แล้ว');
   });
 
+  document.querySelectorAll('.export-stage').forEach(button => {
+    button.addEventListener('click', () => {
+      const stage = button.dataset.stage;
+      const blob = new Blob([QuestionStore.exportCsv(stage, questions)], {type:'text/csv;charset=utf-8'});
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${stage}.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+      showStatus(`ส่งออก ${stageLabels[stage]} เป็น CSV แล้ว`);
+    });
+  });
+
   document.querySelectorAll('.stage-import').forEach(input => {
     input.addEventListener('change', async event => {
       const file = event.target.files[0];
       const stage = event.target.dataset.stage;
       if (!file) return;
       try{
-        const parsed = JSON.parse(await file.text());
-        const rawItems = Array.isArray(parsed) ? parsed : parsed.questions;
+        const text = await file.text();
+        const isCsv = file.name.toLowerCase().endsWith('.csv') || !text.trimStart().match(/^[\[{]/);
+        const parsed = isCsv ? QuestionStore.parseCsv(text, stage) : JSON.parse(text);
+        const rawItems = isCsv ? parsed : (Array.isArray(parsed) ? parsed : parsed.questions);
         if (!Array.isArray(rawItems) || !rawItems.length) throw new Error('ไม่พบรายการโจทย์');
         const stamp = Date.now();
         const imported = QuestionStore.normalizeBank(rawItems).map((item, index) => ({
           ...item,
           id:`${stage}-import-${stamp}-${index}`,
           stage,
+          source:'local',
           level:item.difficulty
         }));
         if (!imported.length) throw new Error('รูปแบบโจทย์ไม่ถูกต้อง');

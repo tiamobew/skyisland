@@ -53,6 +53,7 @@
       stage,
       difficulty,
       level: difficulty,
+      source: item.source === 'csv' ? 'csv' : 'local',
       enabled: item.enabled !== false,
       text,
       answer,
@@ -125,6 +126,75 @@
     return JSON.stringify({ app:'Sky Island', version:3, exportedAt:new Date().toISOString(), questions:load() }, null, 2);
   }
 
+  function parseCsvRows(text) {
+    const rows = [];
+    let row = [];
+    let value = '';
+    let quoted = false;
+    const input = String(text || '').replace(/^\uFEFF/, '');
+    for (let i = 0; i < input.length; i++) {
+      const char = input[i];
+      if (quoted) {
+        if (char === '"' && input[i + 1] === '"') { value += '"'; i++; }
+        else if (char === '"') quoted = false;
+        else value += char;
+      } else if (char === '"') quoted = true;
+      else if (char === ',') { row.push(value); value = ''; }
+      else if (char === '\n') { row.push(value.replace(/\r$/, '')); rows.push(row); row = []; value = ''; }
+      else value += char;
+    }
+    if (value.length || row.length) { row.push(value.replace(/\r$/, '')); rows.push(row); }
+    return rows.filter(item => item.some(cell => String(cell).trim() !== ''));
+  }
+
+  function parseCsv(text, stageOverride) {
+    const rows = parseCsvRows(text);
+    if (rows.length < 2) return [];
+    const headers = rows[0].map(header => String(header).trim().toLowerCase());
+    return normalizeBank(rows.slice(1).map((row, index) => {
+      const item = {};
+      headers.forEach((header, column) => { item[header] = row[column] ?? ''; });
+      return {
+        id: item.id || `${stageOverride || 'question'}-csv-${index + 1}`,
+        stage: stageOverride || item.stage,
+        difficulty: String(item.difficulty || '').trim().toLowerCase(),
+        enabled: !['false', '0', 'no', 'ปิด'].includes(String(item.enabled).trim().toLowerCase()),
+        text: item.text,
+        answer: item.answer,
+        choices: [item.choice1, item.choice2, item.choice3, item.choice4],
+        hint: item.hint,
+        source: 'csv'
+      };
+    }));
+  }
+
+  function csvCell(value) {
+    const text = String(value ?? '');
+    return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  }
+
+  function exportCsv(stage, items) {
+    const headers = ['id','difficulty','enabled','text','answer','choice1','choice2','choice3','choice4','hint'];
+    const lines = (items || load()).filter(item => !stage || item.stage === stage).map(item => [
+      item.id, item.difficulty, item.enabled, item.text, item.answer,
+      ...(item.choices || []).slice(0, 4), item.hint
+    ].map(csvCell).join(','));
+    return `\uFEFF${headers.join(',')}\r\n${lines.join('\r\n')}`;
+  }
+
+  async function syncFromCsvSources() {
+    const results = await Promise.all(STAGES.map(async stage => {
+      const response = await fetch(`data/${stage}.csv?v=${Date.now()}`, { cache:'no-store' });
+      if (!response.ok) throw new Error(`โหลดคลังโจทย์ ${stage} ไม่สำเร็จ`);
+      return parseCsv(await response.text(), stage);
+    }));
+    const current = load().filter(item => item.source !== 'csv');
+    const byId = new Map(current.map(item => [item.id, item]));
+    results.flat().forEach(item => byId.set(item.id, item));
+    const synced = save([...byId.values()]);
+    return { questions:synced, imported:results.reduce((total, items) => total + items.length, 0) };
+  }
+
   window.QuestionStore = {
     STORAGE_KEY,
     STAGES: STAGES.slice(),
@@ -137,6 +207,9 @@
     reset,
     enabledForSelection,
     importJson,
-    exportJson
+    exportJson,
+    parseCsv,
+    exportCsv,
+    syncFromCsvSources
   };
 })();

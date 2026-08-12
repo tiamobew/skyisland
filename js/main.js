@@ -25,7 +25,7 @@ Object.keys(LEVEL_CONFIG).forEach(levelKey => {
   levelContainer.appendChild(btn);
 });
 
-// ---------- ขั้นที่ 2: ปุ่มเลือกเวลาต่อคำถาม (preset + กำหนดเอง + ไม่จำกัด) ----------
+// ---------- ขั้นที่ 2: เลือกกำหนดเวลาเอง หรือไม่จำกัดเวลา ----------
 const timeContainer = document.getElementById('time-buttons');
 
 function selectTime(seconds, sourceBtn) {
@@ -37,13 +37,6 @@ function selectTime(seconds, sourceBtn) {
   else document.getElementById('custom-time-row').classList.add('selected-row');
   document.getElementById('player-count-section').classList.remove('hidden');
 }
-
-TIME_OPTIONS.forEach(seconds => {
-  const btn = document.createElement('button');
-  btn.textContent = `${seconds} วินาที`;
-  btn.addEventListener('click', () => selectTime(seconds, btn));
-  timeContainer.appendChild(btn);
-});
 
 const unlimitedBtn = document.createElement('button');
 unlimitedBtn.textContent = '∞ ไม่จำกัดเวลา';

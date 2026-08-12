@@ -15,8 +15,6 @@ const LEVEL_CONFIG = {
   hard:   { label: 'ยาก (ทศนิยม 2 หลัก · 3 ขั้นตอน)' }
 };
 
-const TIME_OPTIONS = [10, 15, 20, 30];
-
 function easyFallback() {
   const a = randDecimal(5, 30, 1);
   const b = randDecimal(5, 30, 1);

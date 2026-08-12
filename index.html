@@ -84,10 +84,21 @@
   </div>
 
   <div id="win-screen" class="overlay hidden">
-    <div class="panel">
+    <div id="win-effects" aria-hidden="true">
+      <div class="firework firework-one"></div>
+      <div class="firework firework-two"></div>
+      <div class="firework firework-three"></div>
+      <div id="confetti-layer"></div>
+    </div>
+    <div class="panel win-panel">
+      <div class="win-rays" aria-hidden="true"></div>
+      <div class="win-crown" aria-hidden="true">👑</div>
+      <div class="win-label">สุดยอดแชมป์แห่งเกาะลอยฟ้า</div>
       <h1 id="win-text"></h1>
+      <div class="win-trophy" aria-hidden="true">🏆</div>
+      <p id="win-subtitle">ขอแสดงความยินดี! คุณพิชิตเส้นชัยสำเร็จ</p>
       <div id="final-ranking"></div>
-      <button id="restart-btn">เล่นอีกครั้ง</button>
+      <button id="restart-btn">🎮 เล่นอีกครั้ง</button>
     </div>
   </div>
 

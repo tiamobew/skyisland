@@ -126,7 +126,10 @@ document.getElementById('mute-btn').addEventListener('click', (e) => {
 // ---------- ปุ่มเล่นอีกครั้ง ----------
 document.getElementById('restart-btn').addEventListener('click', () => {
   clearPlayerPawns();
-  document.getElementById('win-screen').classList.add('hidden');
+  const winScreen = document.getElementById('win-screen');
+  winScreen.classList.add('hidden');
+  winScreen.classList.remove('celebrating');
+  document.getElementById('confetti-layer').innerHTML = '';
   document.getElementById('difficulty-section').classList.add('hidden');
   document.getElementById('time-section').classList.add('hidden');
   document.getElementById('player-count-section').classList.add('hidden');

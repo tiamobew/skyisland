@@ -227,6 +227,113 @@ body {
   margin:16px 0;
 }
 
+/* ---------- ฉากฉลองผู้ชนะครั้งใหญ่ ---------- */
+#win-screen {
+  z-index:60;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(255,224,94,.33), transparent 31%),
+    linear-gradient(145deg, rgba(18,11,62,.96), rgba(8,39,76,.96));
+}
+#win-effects, #confetti-layer { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.win-panel {
+  position:relative;
+  z-index:3;
+  width:min(560px, 92vw);
+  max-width:560px;
+  padding:28px 34px 30px;
+  overflow:hidden;
+  border:4px solid #FFE45E;
+  border-radius:30px;
+  background:linear-gradient(160deg, rgba(34,27,91,.97), rgba(10,61,92,.97));
+  box-shadow:0 0 0 7px rgba(255,255,255,.12), 0 0 70px rgba(255,228,94,.52), 0 28px 80px rgba(0,0,0,.48);
+}
+.celebrating .win-panel { animation:win-panel-enter .72s cubic-bezier(.16,.82,.28,1.22) both; }
+.win-rays {
+  position:absolute; left:50%; top:26%; z-index:-1;
+  width:680px; height:680px;
+  background:repeating-conic-gradient(from 0deg, rgba(255,228,94,.18) 0 8deg, transparent 8deg 18deg);
+  transform:translate(-50%,-50%);
+  animation:win-rays-spin 18s linear infinite;
+}
+.win-crown { font-size:64px; line-height:1; filter:drop-shadow(0 8px 8px rgba(0,0,0,.4)); animation:crown-bounce 1.15s ease-in-out infinite alternate; }
+.win-label {
+  display:inline-block;
+  margin:7px 0 4px;
+  padding:6px 16px;
+  border-radius:999px;
+  background:linear-gradient(90deg,#FF6B6B,#FFE45E,#6BCB77,#4D96FF,#F472B6);
+  color:#10213f;
+  font-size:14px;
+  font-weight:800;
+}
+.win-panel #win-text {
+  margin:9px 0 0;
+  color:#FFFFFF;
+  font-size:clamp(29px,5vw,46px);
+  line-height:1.15;
+  text-shadow:0 3px 0 #9B5DE5, 0 7px 18px rgba(0,0,0,.55);
+}
+.win-trophy { margin:8px 0 0; font-size:78px; line-height:1; filter:drop-shadow(0 9px 9px rgba(0,0,0,.45)); animation:trophy-glow 1s ease-in-out infinite alternate; }
+.win-panel #win-subtitle { margin:9px 0 13px; color:#E9F7FF; font-size:16px; font-weight:700; opacity:1; }
+.win-panel #final-ranking {
+  position:relative;
+  margin:13px 0 18px;
+  padding:13px;
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:16px;
+  background:rgba(5,19,45,.56);
+  backdrop-filter:blur(7px);
+}
+.win-panel #final-ranking .rank-row { margin-bottom:5px; background:rgba(255,255,255,.09); }
+.win-panel #final-ranking .rank-row:last-child { margin-bottom:0; }
+.win-panel #restart-btn {
+  min-width:210px;
+  border:3px solid #FFFFFF;
+  padding:14px 24px;
+  background:linear-gradient(100deg,#FFE45E,#FFB347);
+  color:#10213f;
+  font-size:20px;
+  font-weight:800;
+  box-shadow:0 9px 22px rgba(255,180,71,.35);
+}
+.win-panel #restart-btn:hover { transform:translateY(-2px) scale(1.03); }
+#confetti-layer i {
+  position:absolute; left:var(--x); top:-25px;
+  width:11px; height:20px;
+  border-radius:2px;
+  background:var(--color);
+  animation:confetti-fall var(--duration) linear var(--delay) infinite;
+}
+#confetti-layer i.confetti-circle { width:13px; height:13px; border-radius:50%; }
+.firework {
+  position:absolute;
+  width:12px; height:12px;
+  border-radius:50%;
+  background:#FFFFFF;
+  opacity:0;
+  box-shadow:0 -75px #FFE45E, 54px -54px #FF6B6B, 75px 0 #4D96FF, 54px 54px #6BCB77, 0 75px #F472B6, -54px 54px #FFFFFF, -75px 0 #FFE45E, -54px -54px #9B5DE5;
+  animation:firework-burst 2.2s ease-out infinite;
+}
+.firework-one { left:17%; top:28%; }
+.firework-two { right:18%; top:20%; animation-delay:.7s; }
+.firework-three { right:12%; bottom:20%; animation-delay:1.35s; }
+@keyframes win-panel-enter { from { opacity:0; transform:translateY(45px) scale(.55) rotate(-3deg); } to { opacity:1; transform:translateY(0) scale(1) rotate(0); } }
+@keyframes win-rays-spin { to { transform:translate(-50%,-50%) rotate(360deg); } }
+@keyframes crown-bounce { to { transform:translateY(-9px) rotate(4deg) scale(1.08); } }
+@keyframes trophy-glow { to { transform:scale(1.1); filter:drop-shadow(0 0 17px #FFE45E); } }
+@keyframes confetti-fall { to { transform:translate3d(var(--drift),110vh,0) rotate(var(--spin)); } }
+@keyframes firework-burst { 0% { opacity:0; transform:scale(.08); } 18% { opacity:1; } 70%,100% { opacity:0; transform:scale(1.18); } }
+@media (max-width:600px) {
+  .win-panel { padding:22px 18px 24px; }
+  .win-crown { font-size:50px; }
+  .win-trophy { font-size:60px; }
+  .win-panel #win-subtitle { font-size:14px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .win-panel, .win-rays, .win-crown, .win-trophy, #confetti-layer i, .firework { animation:none!important; }
+}
+
 /* ---------- แผงคำถาม ---------- */
 #question-panel {
   background:rgba(255,255,255,0.06);

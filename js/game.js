@@ -435,9 +435,29 @@ function renderPlayerPanel() {
 }
 
 // ---------- ชนะเกม ----------
+function launchWinCelebration() {
+  const layer = document.getElementById('confetti-layer');
+  layer.innerHTML = '';
+  const colors = ['#FFE45E','#FF6B6B','#4D96FF','#6BCB77','#F472B6','#FFFFFF','#9B5DE5'];
+  for (let index = 0; index < 90; index++) {
+    const piece = document.createElement('i');
+    piece.style.setProperty('--x', `${Math.random() * 100}vw`);
+    piece.style.setProperty('--drift', `${(Math.random() - 0.5) * 240}px`);
+    piece.style.setProperty('--delay', `${Math.random() * 2.4}s`);
+    piece.style.setProperty('--duration', `${2.8 + Math.random() * 2.4}s`);
+    piece.style.setProperty('--spin', `${360 + Math.random() * 1080}deg`);
+    piece.style.setProperty('--color', colors[index % colors.length]);
+    piece.className = index % 4 === 0 ? 'confetti-circle' : '';
+    layer.appendChild(piece);
+  }
+  playVictoryFanfare();
+}
+
 function showWin(player) {
   clearQuestionTimer();
-  document.getElementById('win-text').textContent = `${player.name} ถึงเส้นชัยก่อน ชนะ! 🎉`;
+  document.getElementById('win-text').textContent = `${player.name} ชนะแล้ว!`;
+  document.getElementById('win-subtitle').textContent =
+    `ขอแสดงความยินดี! พิชิต ${STAGE_CONFIG[currentStage].shortLabel} ระดับ ${DIFFICULTY_CONFIG[currentDifficulty].label.replace(/^\d+\.\s*/, '')} สำเร็จ`;
 
   const ranked = [...players].sort((a, b) => b.score - a.score);
   const rankingEl = document.getElementById('final-ranking');
@@ -456,7 +476,12 @@ function showWin(player) {
     rankingEl.appendChild(row);
   });
 
-  document.getElementById('win-screen').classList.remove('hidden');
+  const winScreen = document.getElementById('win-screen');
+  winScreen.classList.remove('hidden');
+  winScreen.classList.remove('celebrating');
+  void winScreen.offsetWidth;
+  winScreen.classList.add('celebrating');
+  launchWinCelebration();
 }
 
 // ---------- เริ่มเกมใหม่ทั้งหมด ----------

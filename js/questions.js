@@ -7,9 +7,9 @@ const STAGE_CONFIG = {
 };
 
 const DIFFICULTY_CONFIG = {
-  easy:   { label:'ง่าย' },
-  medium: { label:'ปานกลาง' },
-  hard:   { label:'ยาก' }
+  easy:   { label:'1. ง่าย' },
+  medium: { label:'2. ปานกลาง' },
+  hard:   { label:'3. ยาก' }
 };
 
 function randDecimal(min, max, decimals = 1) {

@@ -11,7 +11,8 @@ const PLAYER_COLORS = ['#E4694C', '#3EC6A0', '#FFE49C', '#8B7FE8'];
 let players = [];
 let currentPlayerIndex = 0;
 let currentQuestion = null;
-let currentLevel = 'easy';
+let currentStage = 'decimal';
+let currentDifficulty = 'easy';
 let currentTimeLimit = 15;
 let hintUsedThisQuestion = false;
 
@@ -19,7 +20,7 @@ let timerInterval = null;
 let timerTimeout = null;
 let questionStartTime = null;
 
-const CHAR_SCALE = 1.6;      // ขนาดตัวละคร (ใหญ่ขึ้นจากเดิม)
+const CHAR_SCALE = 1.9;      // ขนาดตัวละครที่มองเห็นได้ชัดขึ้นบนกระดาน
 const BASE_POINTS = 50;      // คะแนนพื้นฐานเมื่อตอบถูก
 const MAX_SPEED_BONUS = 50;  // คะแนนโบนัสสูงสุดเมื่อตอบไวมาก
 const HINT_COST = 20;        // แต้มที่ใช้แลกคำใบ้ 1 ครั้ง
@@ -115,8 +116,8 @@ function updatePawnPosition(playerIndex) {
   const p = players[playerIndex];
   const basePos = tilePositions[p.position];
   const angle = (playerIndex / players.length) * Math.PI * 2;
-  const offsetX = Math.cos(angle) * 0.55;
-  const offsetZ = Math.sin(angle) * 0.55;
+  const offsetX = Math.cos(angle) * 0.68;
+  const offsetZ = Math.sin(angle) * 0.68;
   p.characterGroup.position.set(basePos.x + offsetX, basePos.y, basePos.z + offsetZ);
 }
 
@@ -133,7 +134,7 @@ function animateCharacters(t) {
     const bobOffset = Math.sin(t * 3) * 0.15;
     turnIndicatorMesh.position.set(
       activePlayer.characterGroup.position.x,
-      activePlayer.characterGroup.position.y + 2.0 + bobOffset,
+      activePlayer.characterGroup.position.y + 2.55 + bobOffset,
       activePlayer.characterGroup.position.z
     );
     turnIndicatorMesh.rotation.y += 0.05; // หมุนช้า ๆ ให้เด่น
@@ -273,7 +274,7 @@ function nextTurn() {
 }
 
 function askQuestion() {
-  currentQuestion = generateQuestion(currentLevel);
+  currentQuestion = generateQuestion(currentStage, currentDifficulty);
   document.getElementById('question-text').textContent = currentQuestion.text;
 
   hintUsedThisQuestion = false;
@@ -412,7 +413,7 @@ function renderPlayerPanel() {
   });
 
   document.getElementById('turn-indicator').textContent =
-    `ด่าน${LEVEL_CONFIG[currentLevel].label} — ตาของ ${players[currentPlayerIndex].name}`;
+    `${STAGE_CONFIG[currentStage].label} · ${DIFFICULTY_CONFIG[currentDifficulty].label} — ตาของ ${players[currentPlayerIndex].name}`;
 
   applyPlayerTheme(players[currentPlayerIndex].color);
 }
@@ -443,8 +444,9 @@ function showWin(player) {
 }
 
 // ---------- เริ่มเกมใหม่ทั้งหมด ----------
-function startGame(playerCount, level, timeLimit, names) {
-  currentLevel = level;
+function startGame(playerCount, stage, difficulty, timeLimit, names) {
+  currentStage = stage;
+  currentDifficulty = difficulty;
   currentTimeLimit = timeLimit;
   createPlayers(playerCount, names);
   createPawns();

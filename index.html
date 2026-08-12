@@ -52,11 +52,16 @@
       <h1>เกาะลอยฟ้า ผจญภัยทศนิยม</h1>
       <a class="admin-question-link" href="admin.html">⚙️ Admin จัดการโจทย์</a>
 
-      <p>ขั้นที่ 1: เลือกด่านความยาก</p>
-      <div id="level-buttons" class="button-row"></div>
+      <p>ขั้นที่ 1: เลือกด่านเนื้อหา</p>
+      <div id="stage-buttons" class="button-row stage-buttons"></div>
+
+      <div id="difficulty-section" class="hidden">
+        <p>ขั้นที่ 2: เลือกระดับความยาก</p>
+        <div id="difficulty-buttons" class="button-row"></div>
+      </div>
 
       <div id="time-section" class="hidden">
-        <p>ขั้นที่ 2: เลือกเวลาต่อคำถาม</p>
+        <p>ขั้นที่ 3: เลือกเวลาต่อคำถาม</p>
         <div id="time-buttons" class="button-row"></div>
         <div id="custom-time-row">
           <input type="number" id="custom-time-input" min="5" max="180" placeholder="กำหนดเอง (วินาที)">
@@ -65,12 +70,12 @@
       </div>
 
       <div id="player-count-section" class="hidden">
-        <p>ขั้นที่ 3: เลือกจำนวนผู้เล่น (2-4 คน)</p>
+        <p>ขั้นที่ 4: เลือกจำนวนผู้เล่น (2-4 คน)</p>
         <div id="player-count-buttons" class="button-row"></div>
       </div>
 
       <div id="name-section" class="hidden">
-        <p>ขั้นที่ 4: ตั้งชื่อผู้เล่น</p>
+        <p>ขั้นที่ 5: ตั้งชื่อผู้เล่น</p>
         <div id="name-inputs"></div>
         <button id="confirm-start-btn">เริ่มเกม!</button>
       </div>

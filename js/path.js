@@ -94,7 +94,7 @@ function buildMysteryBox(tileIndex) {
   mark.scale.set(0.42, 0.42, 0.42);
   group.add(mark);
 
-  group.position.set(pos.x, pos.y + 1.25, pos.z);
+  group.position.set(pos.x, pos.y + 2.3, pos.z);
   group.userData.baseY = group.position.y;
   group.userData.phase = Math.random() * Math.PI * 2;
   islandGroup.add(group);

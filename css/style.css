@@ -123,11 +123,16 @@ body {
 .button-row button:active, #restart-btn:active { transform:scale(0.95); }
 .button-row button.selected { background:#FFE49C; }
 
-/* ปุ่มเลือกด่าน มีสีไล่ระดับตามความยาก */
-#level-buttons button[data-level="easy"]   { background:#3EC6A0; }
-#level-buttons button[data-level="medium"] { background:#FFC94C; }
-#level-buttons button[data-level="hard"]   { background:#E4694C; color:#fff; }
-#level-buttons button.selected { outline:3px solid #ffffff; }
+/* ปุ่มเลือกด่านเนื้อหาและระดับความยาก */
+.stage-buttons button { min-width:112px; }
+#stage-buttons button[data-stage="counting"] { background:#4FC3F7; }
+#stage-buttons button[data-stage="decimal"]  { background:#8B7FE8; color:#fff; }
+#stage-buttons button[data-stage="percent"]  { background:#F472B6; color:#fff; }
+#difficulty-buttons button[data-difficulty="easy"]   { background:#3EC6A0; }
+#difficulty-buttons button[data-difficulty="medium"] { background:#FFC94C; }
+#difficulty-buttons button[data-difficulty="hard"]   { background:#E4694C; color:#fff; }
+#stage-buttons button.selected,
+#difficulty-buttons button.selected { outline:3px solid #ffffff; }
 
 /* ---------- แถวกำหนดเวลาเอง ---------- */
 #custom-time-row {

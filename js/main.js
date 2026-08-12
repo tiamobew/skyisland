@@ -1,31 +1,47 @@
 /* =========================================================
    main.js
-   จุดเริ่มต้นของเกม: เลือกด่าน -> เวลา -> จำนวนผู้เล่น -> ตั้งชื่อ -> เริ่มเกม
+   จุดเริ่มต้นของเกม: เลือกด่าน -> ความยาก -> เวลา -> จำนวนผู้เล่น -> ตั้งชื่อ -> เริ่มเกม
    ผูกปุ่มเล่นใหม่ และรันลูปแอนิเมชันหลัก (เกาะลอย, ทะเล, ต้นไม้, เมฆ, ตัวละคร)
    ========================================================= */
 
-let selectedLevel = null;
+let selectedStage = null;
+let selectedDifficulty = null;
 let selectedTime = null;
 let timeStepDone = false;
 let selectedPlayerCount = null;
 
-// ---------- ขั้นที่ 1: ปุ่มเลือกด่าน ----------
-const levelContainer = document.getElementById('level-buttons');
-Object.keys(LEVEL_CONFIG).forEach(levelKey => {
+// ---------- ขั้นที่ 1: ปุ่มเลือกด่านเนื้อหา ----------
+const stageContainer = document.getElementById('stage-buttons');
+Object.keys(STAGE_CONFIG).forEach(stageKey => {
   const btn = document.createElement('button');
-  btn.textContent = LEVEL_CONFIG[levelKey].label;
-  btn.dataset.level = levelKey;
+  btn.textContent = STAGE_CONFIG[stageKey].label;
+  btn.dataset.stage = stageKey;
   btn.addEventListener('click', () => {
-    selectedLevel = levelKey;
-    levelContainer.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+    selectedStage = stageKey;
+    stageContainer.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
-    document.getElementById('time-section').classList.remove('hidden');
+    document.getElementById('difficulty-section').classList.remove('hidden');
     startBackgroundMusic(); // เริ่มเล่นเพลงหลังผู้ใช้คลิกครั้งแรก (นโยบายเบราว์เซอร์)
   });
-  levelContainer.appendChild(btn);
+  stageContainer.appendChild(btn);
 });
 
-// ---------- ขั้นที่ 2: เลือกกำหนดเวลาเอง หรือไม่จำกัดเวลา ----------
+// ---------- ขั้นที่ 2: ปุ่มเลือกระดับความยาก ----------
+const difficultyContainer = document.getElementById('difficulty-buttons');
+Object.keys(DIFFICULTY_CONFIG).forEach(difficultyKey => {
+  const btn = document.createElement('button');
+  btn.textContent = DIFFICULTY_CONFIG[difficultyKey].label;
+  btn.dataset.difficulty = difficultyKey;
+  btn.addEventListener('click', () => {
+    selectedDifficulty = difficultyKey;
+    difficultyContainer.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('time-section').classList.remove('hidden');
+  });
+  difficultyContainer.appendChild(btn);
+});
+
+// ---------- ขั้นที่ 3: เลือกกำหนดเวลาเอง หรือไม่จำกัดเวลา ----------
 const timeContainer = document.getElementById('time-buttons');
 
 function selectTime(seconds, sourceBtn) {
@@ -53,7 +69,7 @@ document.getElementById('custom-time-btn').addEventListener('click', () => {
   selectTime(val, null);
 });
 
-// ---------- ขั้นที่ 3: ปุ่มเลือกจำนวนผู้เล่น ----------
+// ---------- ขั้นที่ 4: ปุ่มเลือกจำนวนผู้เล่น ----------
 const playerCountContainer = document.getElementById('player-count-buttons');
 [2, 3, 4].forEach(count => {
   const btn = document.createElement('button');
@@ -68,7 +84,7 @@ const playerCountContainer = document.getElementById('player-count-buttons');
   playerCountContainer.appendChild(btn);
 });
 
-// ---------- ขั้นที่ 4: ตั้งชื่อผู้เล่น ----------
+// ---------- ขั้นที่ 5: ตั้งชื่อผู้เล่น ----------
 function buildNameInputs(count) {
   const container = document.getElementById('name-inputs');
   container.innerHTML = '';
@@ -83,12 +99,12 @@ function buildNameInputs(count) {
 }
 
 document.getElementById('confirm-start-btn').addEventListener('click', () => {
-  if (!selectedLevel || !timeStepDone || !selectedPlayerCount) return;
+  if (!selectedStage || !selectedDifficulty || !timeStepDone || !selectedPlayerCount) return;
   const names = [];
   for (let i = 0; i < selectedPlayerCount; i++) {
     names.push(document.getElementById(`name-input-${i}`).value);
   }
-  startGame(selectedPlayerCount, selectedLevel, selectedTime, names);
+  startGame(selectedPlayerCount, selectedStage, selectedDifficulty, selectedTime, names);
 });
 
 // ---------- ปุ่มเปิด/ปิดเสียงดนตรี ----------
@@ -100,15 +116,18 @@ document.getElementById('mute-btn').addEventListener('click', (e) => {
 // ---------- ปุ่มเล่นอีกครั้ง ----------
 document.getElementById('restart-btn').addEventListener('click', () => {
   document.getElementById('win-screen').classList.add('hidden');
+  document.getElementById('difficulty-section').classList.add('hidden');
   document.getElementById('time-section').classList.add('hidden');
   document.getElementById('player-count-section').classList.add('hidden');
   document.getElementById('name-section').classList.add('hidden');
-  levelContainer.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+  stageContainer.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+  difficultyContainer.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
   timeContainer.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
   document.getElementById('custom-time-row').classList.remove('selected-row');
   document.getElementById('custom-time-input').value = '';
   playerCountContainer.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
-  selectedLevel = null;
+  selectedStage = null;
+  selectedDifficulty = null;
   selectedTime = null;
   timeStepDone = false;
   selectedPlayerCount = null;

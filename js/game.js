@@ -181,10 +181,11 @@ function resolveMysteryBox(playerIndex, onComplete) {
   }
 
   const messageEl = document.getElementById('round-message');
-  const move = randomRouletteMove();
-  messageEl.textContent = `เจอกล่องลึกลับที่ช่อง ${player.position + 1}! กำลังหมุนวงล้อดวง... 🎁`;
+  messageEl.textContent = `เจอกล่องลึกลับที่ช่อง ${player.position + 1}! กดสุ่มดวงได้เลย 🌈🎁`;
 
-  setTimeout(() => {
+  showMysteryCelebration(player.position + 1, () => {
+    const move = randomRouletteMove();
+    messageEl.textContent = 'กำลังหมุนวงล้อดวง... 🎡';
     spinRoulette(move, () => {
       const requestedTarget = player.position + move;
       const target = Math.max(0, Math.min(TOTAL_TILES - 1, requestedTarget));
@@ -199,7 +200,7 @@ function resolveMysteryBox(playerIndex, onComplete) {
         setTimeout(() => onComplete && onComplete(), 750);
       });
     });
-  }, 500);
+  });
 }
 
 // ---------- เวลานับถอยหลัง ----------

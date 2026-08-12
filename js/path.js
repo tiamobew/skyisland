@@ -10,7 +10,7 @@ const COLS = 8;
 const TILE_SPACING = 2.75;
 const TOTAL_TILES = ROWS * COLS; // 40 ช่อง
 
-const MYSTERY_BOX_COUNT = 6;
+const MYSTERY_BOX_COUNT = 10;
 const MYSTERY_BOX_TILES = new Set();
 const mysteryBoxes = [];
 
@@ -94,7 +94,8 @@ function buildMysteryBox(tileIndex) {
   mark.scale.set(0.42, 0.42, 0.42);
   group.add(mark);
 
-  group.position.set(pos.x, pos.y + 2.3, pos.z);
+  // วางก้นกล่องให้แตะผิวช่องพอดี (ผิวช่องสูงจากจุดกึ่งกลางประมาณ 0.075)
+  group.position.set(pos.x, pos.y + 0.39, pos.z);
   group.userData.baseY = group.position.y;
   group.userData.phase = Math.random() * Math.PI * 2;
   islandGroup.add(group);
@@ -103,8 +104,8 @@ function buildMysteryBox(tileIndex) {
 
 function animateMysteryBoxes(t) {
   mysteryBoxes.forEach(box => {
-    box.position.y = box.userData.baseY + Math.sin(t * 2 + box.userData.phase) * 0.16;
-    box.rotation.y = Math.sin(t * 0.9 + box.userData.phase) * 0.24;
+    box.position.y = box.userData.baseY;
+    box.rotation.y = Math.sin(t * 0.9 + box.userData.phase) * 0.12;
   });
 }
 

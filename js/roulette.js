@@ -10,6 +10,22 @@ function randomRouletteMove() {
   return ROULETTE_OUTCOMES[Math.floor(Math.random() * ROULETTE_OUTCOMES.length)];
 }
 
+function showMysteryCelebration(tileNumber, onSpin) {
+  const overlay = document.getElementById('mystery-celebration');
+  const message = document.getElementById('mystery-celebration-message');
+  const button = document.getElementById('luck-spin-btn');
+  message.textContent = `พบกล่องลึกลับที่ช่อง ${tileNumber}!`;
+  overlay.classList.remove('hidden');
+  playMysteryRainbowSound();
+
+  button.onclick = () => {
+    button.onclick = null;
+    overlay.classList.add('hidden');
+    onSpin && onSpin();
+  };
+  requestAnimationFrame(() => button.focus());
+}
+
 function spinRoulette(move, onComplete) {
   const overlay = document.getElementById('roulette-overlay');
   const wheel = document.getElementById('roulette-wheel');

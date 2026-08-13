@@ -485,6 +485,7 @@ function startGame(playerCount, stage, difficulty, timeLimit, names) {
   currentStage = stage;
   currentDifficulty = difficulty;
   currentTimeLimit = timeLimit;
+  resetMysteryBoxes();
   createPlayers(playerCount, names);
   createPawns();
   currentPlayerIndex = 0;

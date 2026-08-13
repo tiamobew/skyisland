@@ -205,11 +205,7 @@ function resolveMysteryBox(playerIndex, onComplete) {
       const requestedTarget = player.position + move;
       const target = Math.max(0, Math.min(TOTAL_TILES - 1, requestedTarget));
       const actualDelta = target - player.position;
-      const isForward = move > 0;
-
-      messageEl.textContent = isForward
-        ? `วงล้อได้ +${move}! เดินหน้า ${Math.abs(actualDelta)} ช่อง 🍀`
-        : `วงล้อได้ ${move}! ถอยหลัง ${Math.abs(actualDelta)} ช่อง 🌪️`;
+      messageEl.textContent = `วงล้อได้ +${move}! เดินหน้า ${actualDelta} ช่อง 🍀`;
 
       movePawnDelta(playerIndex, actualDelta, () => {
         setTimeout(() => onComplete && onComplete(), 750);

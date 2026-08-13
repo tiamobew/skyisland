@@ -1,10 +1,10 @@
 /* =========================================================
    roulette.js
-   วงล้อกล่องลึกลับ มีผลลัพธ์เดินหน้า/ถอยหลัง 1–5 ช่อง
-   ทั้ง 10 ผลลัพธ์มีโอกาสถูกสุ่มเท่ากัน
+   วงล้อกล่องลึกลับ มีผลลัพธ์เดินหน้า 1–4 ช่อง
+   ทั้ง 4 ผลลัพธ์มีโอกาสถูกสุ่มเท่ากัน
    ========================================================= */
 
-const ROULETTE_OUTCOMES = Object.freeze([1, -1, 2, -2, 3, -3, 4, -4, 5, -5]);
+const ROULETTE_OUTCOMES = Object.freeze([1, 2, 3, 4]);
 
 function randomRouletteMove() {
   return ROULETTE_OUTCOMES[Math.floor(Math.random() * ROULETTE_OUTCOMES.length)];
@@ -31,7 +31,7 @@ function spinRoulette(move, onComplete) {
   const wheel = document.getElementById('roulette-wheel');
   const result = document.getElementById('roulette-result');
   const targetIndex = ROULETTE_OUTCOMES.indexOf(move);
-  const targetAngle = targetIndex * 36 + 18;
+  const targetAngle = targetIndex * 90 + 45;
 
   result.textContent = 'กำลังหมุน...';
   result.className = '';
@@ -47,11 +47,8 @@ function spinRoulette(move, onComplete) {
   });
 
   setTimeout(() => {
-    const isForward = move > 0;
-    result.textContent = isForward
-      ? `เดินหน้า ${move} ช่อง!`
-      : `ถอยหลัง ${Math.abs(move)} ช่อง!`;
-    result.className = isForward ? 'forward' : 'backward';
+    result.textContent = `เดินหน้า ${move} ช่อง!`;
+    result.className = 'forward';
 
     setTimeout(() => {
       overlay.classList.add('hidden');

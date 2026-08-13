@@ -631,7 +631,7 @@ body {
   overflow:hidden;
   border:7px solid #ffffff;
   border-radius:50%;
-  background:repeating-conic-gradient(#3EC6A0 0deg 36deg, #E4694C 36deg 72deg);
+  background:repeating-conic-gradient(#3EC6A0 0deg 90deg, #E4694C 90deg 180deg);
   box-shadow:0 8px 24px rgba(0,0,0,0.38), inset 0 0 0 3px rgba(6,40,61,0.5);
   transition:transform 2.2s cubic-bezier(.12,.72,.18,1);
 }
@@ -665,4 +665,3 @@ body {
   color:#ffffff;
 }
 #roulette-result.forward { color:#7DE3C8; }
-#roulette-result.backward { color:#FF9B86; }

@@ -18,8 +18,8 @@ body {
 }
 
 #panel-question {
-  width:38%;
-  min-width:300px;
+  width:35%;
+  min-width:320px;
   background:linear-gradient(180deg, #0c2038, #0a1830);
   padding:16px;
   display:flex;

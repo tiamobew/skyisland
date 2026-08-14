@@ -10,9 +10,9 @@ scene.fog = new THREE.FogExp2(0xbfe3f0, 0.009);
 const sceneContainer = document.getElementById('scene-container');
 
 const camera = new THREE.PerspectiveCamera(
-  55, sceneContainer.clientWidth / sceneContainer.clientHeight, 0.1, 1000
+  52, sceneContainer.clientWidth / sceneContainer.clientHeight, 0.1, 1000
 );
-camera.position.set(0, 17, 27);
+camera.position.set(0, 22, 34);
 camera.lookAt(0, 0, 0);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });

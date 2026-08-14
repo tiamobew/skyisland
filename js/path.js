@@ -6,9 +6,9 @@
    ========================================================= */
 
 const ROWS = 5;
-const COLS = 8;
-const TILE_SPACING = 2.75;
-const TOTAL_TILES = ROWS * COLS; // 40 ช่อง
+const COLS = 6;
+const TILE_SPACING = 3.15;
+const TOTAL_TILES = ROWS * COLS; // 30 ช่อง
 
 const MYSTERY_BOX_COUNT = 8;
 const MYSTERY_BOX_TILES = new Set();

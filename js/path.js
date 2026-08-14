@@ -6,11 +6,11 @@
    ========================================================= */
 
 const ROWS = 5;
-const COLS = 8;
-const TILE_SPACING = 2.75;
-const TOTAL_TILES = ROWS * COLS; // 40 ช่อง
+const COLS = 6;
+const TILE_SPACING = 3.15;
+const TOTAL_TILES = ROWS * COLS; // 30 ช่อง
 
-const MYSTERY_BOX_COUNT = 10;
+const MYSTERY_BOX_COUNT = 8;
 const MYSTERY_BOX_TILES = new Set();
 const mysteryBoxes = [];
 
@@ -47,6 +47,7 @@ function makeTileNumberTexture(number, bgColor) {
 }
 
 function chooseMysteryBoxTiles() {
+  MYSTERY_BOX_TILES.clear();
   const candidates = Array.from({ length: TOTAL_TILES - 4 }, (_, i) => i + 2);
   for (let i = candidates.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -70,7 +71,7 @@ function makeQuestionMarkTexture() {
 function buildMysteryBox(tileIndex) {
   const pos = tilePositions[tileIndex];
   const group = new THREE.Group();
-  const boxMat = new THREE.MeshStandardMaterial({ color: 0x8b5cf6, roughness: 0.42 });
+  const boxMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.42 });
   const goldMat = new THREE.MeshStandardMaterial({ color: 0xffc94c, roughness: 0.35 });
 
   const box = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.58, 0.72), boxMat);
@@ -109,6 +110,30 @@ function animateMysteryBoxes(t) {
   });
 }
 
+function resetMysteryBoxes() {
+  mysteryBoxes.forEach(group => {
+    islandGroup.remove(group);
+    group.traverse(child => {
+      child.geometry?.dispose();
+      child.material?.map?.dispose();
+      child.material?.dispose();
+    });
+  });
+  mysteryBoxes.length = 0;
+  chooseMysteryBoxTiles();
+
+  tileMeshes.forEach((tile, i) => {
+    const isLast = i === TOTAL_TILES - 1;
+    const hasMysteryBox = MYSTERY_BOX_TILES.has(i);
+    tile.material.color.setHex(isLast
+      ? 0xFFE49C
+      : hasMysteryBox
+        ? 0xfca5a5
+        : (i % 2 === 0 ? 0xE9D8A6 : 0xDCC488));
+    if (hasMysteryBox) buildMysteryBox(i);
+  });
+}
+
 function buildPath() {
   const offsetX = ((COLS - 1) * TILE_SPACING) / 2;
   const offsetZ = ((ROWS - 1) * TILE_SPACING) / 2;
@@ -133,7 +158,7 @@ function buildPath() {
       color: isLast
         ? 0xFFE49C
         : hasMysteryBox
-          ? 0xd8b4fe
+          ? 0xfca5a5
           : (i % 2 === 0 ? 0xE9D8A6 : 0xDCC488)
     });
     const tile = new THREE.Mesh(tileGeo, tileMat);
